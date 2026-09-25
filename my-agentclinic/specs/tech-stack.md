@@ -17,9 +17,9 @@ A server-side TypeScript web app: **Node.js + Hono** with server-rendered JSX, b
 | Database | SQLite | Zero-config, file-based, reliable for this scale |
 | DB access | `better-sqlite3` | Simple, synchronous, popular |
 | Validation | Zod | Validate form input and share types |
-| Testing | Vitest | Fast, TypeScript-native; test routes with Hono's `app.request()` |
+| Testing and validation | Vitest | Fast, TypeScript-native; test routes with Hono's `app.request()`; automated checks in each phase's `validation.md` are written as Vitest tests |
 | Dev loop | `tsx watch` | Run TypeScript directly with reload |
-| Build | `tsc` | Already configured in the project |
+| Build | `tsc -p tsconfig.build.json` | Emits `dist/` without test files; `tsconfig.json` stays the full config used for type-checking and tests |
 | Formatting and linting | Prettier + ESLint (typescript-eslint) | Consistent code |
 
 ## Browser support
@@ -29,6 +29,8 @@ The latest two versions of Chrome, Edge, Firefox, and Safari. No legacy browser 
 ## Conventions
 
 - Source lives in `src/`; tests sit next to the code as `*.test.ts`.
+- Every automated check in a phase's `validation.md` is backed by a Vitest test.
+- `npm run validate` type-checks all of `src/` (tests included) and runs the Vitest suite; a phase is ready to merge only when it passes.
 - Routes are grouped by feature (agents, ailments, therapies, appointments, dashboard).
 - Database schema changes go through numbered SQL migration files.
 - Configuration comes from environment variables with sensible defaults.

@@ -2,10 +2,19 @@
 
 The branch can merge when every check below passes.
 
-## Automated
+## Automated (Vitest)
+
+Run with `npm run validate`, which type-checks all of `src/` (tests included) and runs the Vitest suite.
+
+- [x] `GET /` returns status 200, an HTML `Content-Type`, and a body containing `<title>AgentClinic</title>` and "Welcome to AgentClinic" (`src/app.test.ts`).
+- [x] `GET /` renders a `<header>`, `<main>`, and `<footer>`, and links `/styles.css` (`src/app.test.ts`).
+- [x] `GET /styles.css` returns status 200 with a `text/css` `Content-Type` (`src/app.test.ts`).
+- [x] `Header`, `Main`, and `Footer` each render from their own file under `src/components/` (`src/layout.test.tsx`).
+- [x] `Layout` renders `lang="en"`, charset and viewport meta tags, an HTML-escaped `<title>` from its `title` prop, the stylesheet link in `<head>`, and `<header>`, `<main>` (containing its children), and `<footer>` in order (`src/layout.test.tsx`).
+
+## Build
 
 - [x] `npm install` completes without errors.
-- [x] `npm test` passes, including a test that `GET /` returns status 200, an HTML `Content-Type`, and a body containing `<title>AgentClinic</title>`, "Welcome to AgentClinic", a `<header>`, `<main>`, and `<footer>`, and a link to `/styles.css`; and a test that `GET /styles.css` returns status 200 with a `text/css` `Content-Type`.
 - [x] `npm run build` compiles with strict TypeScript and no errors, and `dist/` contains no test files.
 
 ## Manual
@@ -18,5 +27,4 @@ The branch can merge when every check below passes.
 ## Housekeeping
 
 - [x] Phase 0 items are checked off in `specs/roadmap.md`.
-- [x] `Header`, `Main`, and `Footer` each live in their own file under `src/components/`, and `src/layout.tsx` imports them.
 - [x] Nothing out of scope (navigation, design system, database, linting) was added.

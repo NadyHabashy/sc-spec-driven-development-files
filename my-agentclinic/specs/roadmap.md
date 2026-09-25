@@ -5,8 +5,8 @@ The app is built in very small phases. Each phase is shippable on its own: the a
 ## Phase 0: Skeleton
 - [x] Install Hono, `@hono/node-server`, `tsx`, and Vitest
 - [x] Serve "Welcome to AgentClinic" at `/`
-- [x] Add `dev`, `build`, `start`, and `test` npm scripts
-- [x] Add one passing route test
+- [x] Add `dev`, `build`, `start`, `test`, and `validate` npm scripts
+- [x] Add passing Vitest tests for every automated validation check
 
 ## Phase 1: Layout and look
 - [ ] Shared JSX layout with header, nav, and footer

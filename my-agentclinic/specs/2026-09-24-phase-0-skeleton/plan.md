@@ -7,8 +7,9 @@ See `requirements.md` for scope and decisions, and `validation.md` for merge cri
 1.1 Install `hono` and `@hono/node-server` as dependencies.
 1.2 Install `tsx`, `vitest`, and `@types/node` as dev dependencies.
 1.3 Add `"type": "module"` to `package.json`.
-1.4 Add `dev`, `start`, and `test` scripts (keep `build`).
-1.5 Update `tsconfig.json`: `target` ES2022, `module`/`moduleResolution` NodeNext, Hono JSX settings, exclude `*.test.ts` from the build.
+1.4 Add `dev`, `start`, `test`, and `validate` scripts, and point `build` at `tsconfig.build.json`.
+1.5 Update `tsconfig.json`: `target` ES2022, `module`/`moduleResolution` NodeNext, Hono JSX settings, covering all of `src/` including tests.
+1.6 Create `tsconfig.build.json` that extends `tsconfig.json` and excludes `*.test.ts` and `*.test.tsx`, so tests are type-checked but never emitted to `dist/`.
 
 ## 2. Hono app and `/` route
 
@@ -30,13 +31,15 @@ See `requirements.md` for scope and decisions, and `validation.md` for merge cri
 4.5 Link the stylesheet from the `Layout` `<head>` with `<link rel="stylesheet" href="/styles.css">`.
 4.6 Update `HomePage` in `src/home.tsx` to render its heading and tagline inside `Layout`.
 
-## 5. Route tests
+## 5. Tests
 
 5.1 Create `src/app.test.ts` that calls `app.request('/')`.
 5.2 Assert status 200, an HTML `Content-Type`, and that the body contains `<title>AgentClinic</title>` and "Welcome to AgentClinic".
 5.3 Assert the body contains a `<header>`, `<main>`, and `<footer>`, and a link to `/styles.css`.
 5.4 Assert `GET /styles.css` returns status 200 with a `text/css` `Content-Type`.
-5.5 Run `npm test` and confirm it passes.
+5.5 Create `src/layout.test.tsx` that imports `Header`, `Main`, and `Footer` from their files under `src/components/` and asserts each renders its landmark element (`Main` also renders its children).
+5.6 In `src/layout.test.tsx`, add a `Layout` suite asserting `lang="en"`, charset and viewport meta tags, the `title` prop (HTML-escaped) as the document title, the stylesheet link in `<head>`, `<header>`/`<main>`/`<footer>` in order, and children rendered inside `<main>`.
+5.7 Run `npm run validate` and confirm it passes.
 
 ## 6. Roadmap update
 
