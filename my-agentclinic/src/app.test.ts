@@ -30,4 +30,12 @@ describe('GET /styles.css', () => {
     expect(res.status).toBe(200)
     expect(res.headers.get('Content-Type')).toMatch(/^text\/css/)
   })
+
+  it('is mobile-first, enhancing larger screens with min-width media queries', async () => {
+    const css = await (await app.request('/styles.css')).text()
+
+    expect(css).toMatch(/@media\s*\(min-width:\s*40rem\)/)
+    expect(css).toMatch(/@media\s*\(min-width:\s*64rem\)/)
+    expect(css).not.toMatch(/@media[^{]*max-width/)
+  })
 })

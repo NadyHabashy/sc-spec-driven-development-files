@@ -15,13 +15,14 @@ In scope:
 - Serve a minimal AgentClinic home page at `GET /`: a valid HTML document rendered with Hono JSX, titled "AgentClinic", with an `<h1>` "Welcome to AgentClinic" and a one-line tagline.
 - A main `Layout` component built from three subcomponents, `Header`, `Main`, and `Footer`, each in its own file.
 - A stylesheet at `public/styles.css`, served at `/styles.css` and linked from the layout.
+- A responsive layout that follows the rules in `specs/tech-stack.md`: mobile-first CSS, fluid spacing and type, no horizontal scrolling at `320px`, and touch-friendly links.
 - npm scripts: `dev`, `build`, `start`, `test`, `validate`.
 - Vitest tests backing every automated check in `validation.md`: route tests using Hono's `app.request()` and render tests for the layout subcomponents.
 - Check off Phase 0 items in `specs/roadmap.md`.
 
 Out of scope (later phases):
 
-- Navigation links, a full design system (colors, typography, responsive grid), and the full playful home page copy (Phase 1). Phase 0 ships only the layout structure and base styles.
+- Navigation links, a full design system (colors, typography, responsive content grid), and the full playful home page copy (Phase 1). Phase 0 ships only the layout structure and responsive base styles.
 - Database, migrations, seeds (Phase 2).
 - Prettier and ESLint setup.
 - htmx or any client-side JavaScript.
@@ -37,6 +38,7 @@ Out of scope (later phases):
 | Home page | `HomePage` component in `src/home.tsx`, rendered inside `Layout` and returned via `c.html()` | Pages supply only their content; the layout owns the document shell |
 | Layout | `Layout` in `src/layout.tsx` renders the document with `lang`, charset, viewport, `<title>`, and the stylesheet link | One place for the page shell; semantic landmarks for accessibility |
 | Layout subcomponents | One file each: `src/components/header.tsx`, `src/components/main.tsx`, `src/components/footer.tsx`, imported by `Layout` | Small, focused files that are easy to find and change independently |
+| Responsive design | Mobile-first `public/styles.css`: base styles for phones, `min-width` media queries at `40rem` and `64rem`, `clamp()` for page spacing and heading size, `2.75rem` minimum link target | Tech-stack responsive rules; the page works on phones, tablets, and desktops from the first phase |
 | Stylesheet | Plain CSS in `public/styles.css`, served with `serveStatic` from `@hono/node-server/serve-static`, linked with `<link rel="stylesheet">` | Tech-stack choice of plain CSS; no CSS build step |
 | Port | `PORT` env var, default `3000` | Tech-stack convention: config from env vars with sensible defaults |
 | Strictness | Keep `strict: true` | Mission principle: reliable by default |

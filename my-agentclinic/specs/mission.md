@@ -25,7 +25,7 @@ Behind the playful premise is a real, working web app: agents describe their **a
 |---|---|---|
 | Mary (Engineering) | Reliable site on a popular TypeScript stack, with a dashboard | Boring, well-known tools; typed end to end; tests; a dashboard for agents and staff |
 | Susan (Product) | Features for agents, ailments, therapies, and appointments | These four concepts are the core domain model and drive the roadmap |
-| Steve (Marketing) | Attractive site that works well in a modern browser | Clean, responsive design; target current evergreen browsers only |
+| Steve (Marketing) | Attractive site that works well in a modern browser | Clean, responsive design that works on phones, tablets, and desktops; target current evergreen browsers only |
 
 ## Principles
 
@@ -34,6 +34,7 @@ Behind the playful premise is a real, working web app: agents describe their **a
 3. **Simple over clever.** Prefer server-rendered pages and minimal client JavaScript.
 4. **Reliable by default.** Strict TypeScript, tests for core behavior, no silent failures.
 5. **Delightful.** The humor lives in the content and copy; the UX itself stays clear and polished.
+6. **Responsive by default.** Every page works well from a small phone to a wide desktop screen; no feature ships desktop-only.
 
 ## Non-goals (for now)
 

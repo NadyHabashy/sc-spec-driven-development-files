@@ -27,6 +27,7 @@ See `requirements.md` for scope and decisions, and `validation.md` for merge cri
 4.1 Create each layout subcomponent in its own file under `src/components/`: `Header` in `header.tsx` (site name linking to `/`), `Main` in `main.tsx` (wraps page content in `<main>`), and `Footer` in `footer.tsx` (a one-line footer).
 4.2 Create `src/layout.tsx` with a `Layout` component that imports `Header`, `Main`, and `Footer`, takes a `title` and `children`, and renders the full HTML document (`lang`, charset, viewport, `<title>`) with the three subcomponents in the body.
 4.3 Create `public/styles.css` with base styles for the body, header, main, and footer, using CSS custom properties for colors.
+4.3a Make the stylesheet mobile-first per `specs/tech-stack.md`: base styles for small screens, `min-width` media queries at `40rem` and `64rem`, fluid page spacing and `h1` size with `clamp()`, media capped at `max-width: 100%`, long words wrapping, and a `2.75rem` minimum height for the header link.
 4.4 In `src/app.tsx`, import `serveStatic` from `@hono/node-server/serve-static` and serve `public/` so the stylesheet is available at `/styles.css`.
 4.5 Link the stylesheet from the `Layout` `<head>` with `<link rel="stylesheet" href="/styles.css">`.
 4.6 Update `HomePage` in `src/home.tsx` to render its heading and tagline inside `Layout`.
@@ -39,7 +40,8 @@ See `requirements.md` for scope and decisions, and `validation.md` for merge cri
 5.4 Assert `GET /styles.css` returns status 200 with a `text/css` `Content-Type`.
 5.5 Create `src/layout.test.tsx` that imports `Header`, `Main`, and `Footer` from their files under `src/components/` and asserts each renders its landmark element (`Main` also renders its children).
 5.6 In `src/layout.test.tsx`, add a `Layout` suite asserting `lang="en"`, charset and viewport meta tags, the `title` prop (HTML-escaped) as the document title, the stylesheet link in `<head>`, `<header>`/`<main>`/`<footer>` in order, and children rendered inside `<main>`.
-5.7 Run `npm run validate` and confirm it passes.
+5.7 In `src/app.test.ts`, assert `GET /styles.css` is mobile-first: it contains `min-width` media queries at `40rem` and `64rem` and no `max-width` media queries.
+5.8 Run `npm run validate` and confirm it passes.
 
 ## 6. Roadmap update
 
