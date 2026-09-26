@@ -3,7 +3,9 @@ export type NavItem = { href: string; label: string }
 // Each later phase adds its page's link here when the page ships.
 export const navItems: NavItem[] = [{ href: '/', label: 'Home' }]
 
-export const Nav = ({ currentPath }: { currentPath: string }) => (
+export type NavProps = { currentPath: string }
+
+export const Nav = ({ currentPath }: NavProps) => (
   <nav aria-label="Primary">
     <ul>
       <li>

@@ -3,15 +3,13 @@ import { Footer } from './components/footer.js'
 import { Header } from './components/header.js'
 import { Main } from './components/main.js'
 
-export const Layout = ({
-  title,
-  currentPath = '/',
-  children,
-}: {
+export type LayoutProps = {
   title: string
   currentPath?: string
   children?: Child
-}) => (
+}
+
+export const Layout = ({ title, currentPath = '/', children }: LayoutProps) => (
   <html lang="en">
     <head>
       <meta charset="utf-8" />
