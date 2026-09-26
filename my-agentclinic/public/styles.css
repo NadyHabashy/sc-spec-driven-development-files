@@ -6,7 +6,8 @@
   --touch-target: 2.75rem;
 }
 
-/* Brand teal, tuned per theme so links and buttons stay readable. */
+/* Brand teal, tuned per theme so links and buttons stay readable
+   (white on every button background is at least 4.5:1). */
 :root:not([data-theme="dark"]),
 [data-theme="light"] {
   --pico-primary: #1f6f5f;
@@ -18,27 +19,46 @@
   --pico-primary-hover-border: #17564a;
   --pico-primary-hover-underline: #17564a;
   --pico-primary-focus: rgba(31, 111, 95, 0.4);
+  --pico-text-selection-color: rgba(31, 111, 95, 0.25);
 }
 
+/* Dark values appear twice to match Pico: once for the OS preference and
+   once for an explicit data-theme="dark". */
 @media only screen and (prefers-color-scheme: dark) {
   :root:not([data-theme]) {
     --pico-primary: #5cc4ae;
-    --pico-primary-background: #2f8f7b;
-    --pico-primary-border: #2f8f7b;
+    --pico-primary-background: #1f6f5f;
+    --pico-primary-border: #1f6f5f;
     --pico-primary-underline: rgba(92, 196, 174, 0.5);
     --pico-primary-hover: #86d6c4;
-    --pico-primary-hover-background: #37a38c;
-    --pico-primary-hover-border: #37a38c;
+    --pico-primary-hover-background: #237563;
+    --pico-primary-hover-border: #237563;
     --pico-primary-hover-underline: #86d6c4;
     --pico-primary-focus: rgba(92, 196, 174, 0.4);
+    --pico-text-selection-color: rgba(92, 196, 174, 0.1875);
   }
 }
 
-body {
-  overflow-wrap: break-word;
+[data-theme="dark"] {
+  --pico-primary: #5cc4ae;
+  --pico-primary-background: #1f6f5f;
+  --pico-primary-border: #1f6f5f;
+  --pico-primary-underline: rgba(92, 196, 174, 0.5);
+  --pico-primary-hover: #86d6c4;
+  --pico-primary-hover-background: #237563;
+  --pico-primary-hover-border: #237563;
+  --pico-primary-hover-underline: #86d6c4;
+  --pico-primary-focus: rgba(92, 196, 174, 0.4);
+  --pico-text-selection-color: rgba(92, 196, 174, 0.1875);
 }
 
-img,
+/* Fluid container in rem instead of Pico's fixed pixel widths, so layout
+   follows our breakpoints (see specs/tech-stack.md). */
+.container {
+  max-width: 75rem;
+  padding-inline: var(--pico-spacing);
+}
+
 svg,
 video {
   max-width: 100%;
@@ -60,9 +80,15 @@ nav li :where(a, [role="link"]) {
   min-height: var(--touch-target);
 }
 
+/* Pico removes the underline from nav links, which leaves the current page
+   distinguished by color alone. */
+nav li a[aria-current="page"] {
+  text-decoration: underline;
+  font-weight: 600;
+}
+
 .site-name {
   font-size: 1.25rem;
-  text-decoration: none;
 }
 
 .hero .tagline {
@@ -72,7 +98,7 @@ nav li :where(a, [role="link"]) {
 
 .feature-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--pico-spacing);
 }
 
@@ -86,7 +112,12 @@ footer {
 
 @media (min-width: 40rem) {
   .feature-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* An odd card out spans the full row instead of sitting alone. */
+  .feature-grid > :last-child:nth-child(odd) {
+    grid-column: 1 / -1;
   }
 }
 
@@ -96,6 +127,10 @@ footer {
   }
 
   .feature-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .feature-grid > :last-child:nth-child(odd) {
+    grid-column: auto;
   }
 }

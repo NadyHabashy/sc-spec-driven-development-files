@@ -33,12 +33,14 @@ describe('GET /', () => {
   it('marks the Home nav link as the current page', async () => {
     const body = await (await app.request('/')).text()
 
-    expect(body).toContain('<a href="/" aria-current="page">Home</a>')
+    expect(body).toMatch(/<a [^>]*aria-current="page"[^>]*>Home<\/a>/)
   })
 
   it('renders three feature cards inside the feature grid', async () => {
     const body = await (await app.request('/')).text()
-    const grid = body.match(/<div class="feature-grid">([\s\S]*?)<\/div>/)?.[1] ?? ''
+    const start = body.indexOf('<div class="feature-grid">')
+    expect(start).toBeGreaterThan(-1)
+    const grid = body.slice(start, body.indexOf('</main>'))
 
     const headings = [...grid.matchAll(/<article><h2>([^<]+)<\/h2>/g)].map((m) => m[1])
     expect(headings).toEqual(['Ailments', 'Therapies', 'Appointments'])
@@ -82,5 +84,37 @@ describe('GET /styles.css', () => {
     const css = await (await app.request('/styles.css')).text()
 
     expect(css).toMatch(/\.feature-grid\s*{[^}]*grid-template-columns/)
+  })
+
+  it('gives nav links a 2.75rem minimum touch target', async () => {
+    const css = await (await app.request('/styles.css')).text()
+
+    expect(css).toMatch(/--touch-target:\s*2\.75rem/)
+    expect(css).toMatch(/nav li :where\(a, \[role="link"\]\)\s*{[^}]*min-height:\s*var\(--touch-target\)/)
+  })
+
+  it('makes the container fluid with a rem max-width', async () => {
+    const css = await (await app.request('/styles.css')).text()
+
+    expect(css).toMatch(/\.container\s*{[^}]*max-width:\s*[\d.]+rem/)
+  })
+
+  it('distinguishes the current nav link beyond color', async () => {
+    const css = await (await app.request('/styles.css')).text()
+
+    expect(css).toMatch(/nav li a\[aria-current="page"\]\s*{[^}]*text-decoration:\s*underline/)
+  })
+})
+
+describe('static assets', () => {
+  it('are served regardless of the working directory', async () => {
+    const cwd = process.cwd()
+    process.chdir(new URL('.', import.meta.url).pathname)
+    try {
+      expect((await app.request('/pico.min.css')).status).toBe(200)
+      expect((await app.request('/styles.css')).status).toBe(200)
+    } finally {
+      process.chdir(cwd)
+    }
   })
 })

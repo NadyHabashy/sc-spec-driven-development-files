@@ -8,6 +8,9 @@ All notable changes to AgentClinic, grouped by date (newest first).
 - Added a data-driven `Nav` component (`src/components/nav.tsx`) with the site name and a Home link marked `aria-current="page"`; `Layout` takes an optional `currentPath`, and the header, main, and footer use Pico's `container` class.
 - Rewrote the home page with a playful hero and three feature cards (Ailments, Therapies, Appointments) in a new `.feature-grid` that shows one, two, or three columns at the `40rem` and `64rem` breakpoints.
 - Added Vitest coverage for the nav, Pico serving, container classes, stylesheet order, home page cards, and brand stylesheet rules.
+- Extracted component props into named TypeScript types (`NavProps`, `HeaderProps`, `MainProps`, `LayoutProps`).
+- Fixed issues found in a branch review: `Layout` now requires `currentPath`; Pico and `public/` are resolved from the module so the app works from any directory; dark-mode button colors now meet 4.5:1 contrast; the current nav link is underlined and bold; `.container` is fluid in `rem` instead of Pico's fixed pixel widths; an odd card spans the row at tablet width; brand colors cover text selection and an explicit `data-theme="dark"`; `navItems` is `readonly`; and tests are less brittle, with new checks for touch targets, the container, dependencies, and working-directory independence.
+- Recorded Phase 1 validation results in `validation.md`, and documented Pico's breakpoints and module-relative asset paths in `specs/tech-stack.md`.
 - Added the Phase 1 layout-and-look spec and switched the tech stack's styling choice to Pico CSS.
 
 ## 2026-09-25

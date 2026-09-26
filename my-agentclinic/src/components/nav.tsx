@@ -1,7 +1,7 @@
 export type NavItem = { href: string; label: string }
 
 // Each later phase adds its page's link here when the page ships.
-export const navItems: NavItem[] = [{ href: '/', label: 'Home' }]
+export const navItems: readonly NavItem[] = [{ href: '/', label: 'Home' }]
 
 export type NavProps = { currentPath: string }
 

@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { Nav, navItems } from './nav.js'
 
+const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
 describe('Nav', () => {
   const render = (currentPath = '/') => (<Nav currentPath={currentPath} />).toString()
 
@@ -19,7 +21,9 @@ describe('Nav', () => {
   it('renders one link per nav item', () => {
     const html = render()
     for (const { href, label } of navItems) {
-      expect(html).toMatch(new RegExp(`<a href="${href}"[^>]*>${label}</a>`))
+      expect(html).toMatch(
+        new RegExp(`<a [^>]*href="${escapeRegExp(href)}"[^>]*>${escapeRegExp(label)}</a>`),
+      )
     }
   })
 

@@ -23,9 +23,9 @@ describe('layout subcomponents', () => {
 })
 
 describe('Layout', () => {
-  const render = (title = 'AgentClinic') =>
+  const render = (title = 'AgentClinic', currentPath = '/') =>
     (
-      <Layout title={title}>
+      <Layout title={title} currentPath={currentPath}>
         <p>page content</p>
       </Layout>
     ).toString()
@@ -56,8 +56,12 @@ describe('Layout', () => {
     expect(styles).toBeGreaterThan(pico)
   })
 
-  it('defaults currentPath to /', () => {
-    expect(render()).toContain('<a href="/" aria-current="page">Home</a>')
+  it('requires currentPath and passes it to the nav', () => {
+    // @ts-expect-error currentPath is required so no page silently marks Home as current
+    ;(<Layout title="AgentClinic" />).toString()
+
+    expect(render('AgentClinic', '/')).toMatch(/<a [^>]*aria-current="page"[^>]*>Home<\/a>/)
+    expect(render('AgentClinic', '/elsewhere')).not.toContain('aria-current')
   })
 
   it('renders header, main, and footer in order', () => {

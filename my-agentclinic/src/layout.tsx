@@ -5,11 +5,11 @@ import { Main } from './components/main.js'
 
 export type LayoutProps = {
   title: string
-  currentPath?: string
+  currentPath: string
   children?: Child
 }
 
-export const Layout = ({ title, currentPath = '/', children }: LayoutProps) => (
+export const Layout = ({ title, currentPath, children }: LayoutProps) => (
   <html lang="en">
     <head>
       <meta charset="utf-8" />

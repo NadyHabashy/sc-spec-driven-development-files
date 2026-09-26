@@ -37,6 +37,8 @@ Every page must work on phones, tablets, and desktops.
 - Layouts use flexbox and grid that wrap or reflow instead of overflowing; no horizontal scrolling at a `320px` viewport width.
 - Images and media never exceed their container (`max-width: 100%`).
 - Interactive elements (links, buttons, form controls) have a touch target of at least `2.75rem` (44px).
+- Pico CSS ships its own breakpoints (for type scale and its `.container` widths) that don't match ours. We accept Pico's type scaling as-is, but override `.container` in `public/styles.css` to a fluid, `rem`-based `max-width` so layout follows our breakpoints and has no fixed pixel widths.
+- Static assets (Pico and `public/`) are resolved relative to the app's modules, not the working directory, so the app serves them however it's started.
 - Each phase's `validation.md` includes a manual check at phone (`320px`), tablet (`768px`), and desktop (`1280px`) widths.
 
 ## Conventions
