@@ -12,7 +12,7 @@ A server-side TypeScript web app: **Node.js + Hono** with server-rendered JSX, b
 | Runtime | Node.js (current LTS) | Popular and stable |
 | Web framework | [Hono](https://hono.dev) with `@hono/node-server` | Small, fast, well-typed, widely used, built-in JSX rendering |
 | Views | Hono JSX (server-rendered) | Type-checked templates with no frontend build step |
-| Styling | Plain modern CSS (custom properties, grid, flexbox) | Attractive and responsive in evergreen browsers without a CSS framework |
+| Styling | [Pico CSS](https://picocss.com) v2 (`@picocss/pico`, served locally from npm), plus brand overrides in `public/styles.css` (custom properties, grid, flexbox) | Attractive, responsive, and accessible defaults for semantic HTML with few classes and no build step |
 | Interactivity | Progressive enhancement; add [htmx](https://htmx.org) only if needed | Keeps client JS minimal |
 | Database | SQLite | Zero-config, file-based, reliable for this scale |
 | DB access | `better-sqlite3` | Simple, synchronous, popular |
@@ -31,7 +31,7 @@ The latest two versions of Chrome, Edge, Firefox, and Safari. No legacy browser 
 Every page must work on phones, tablets, and desktops.
 
 - Every page includes `<meta name="viewport" content="width=device-width, initial-scale=1">` (provided by the shared layout).
-- CSS is mobile-first: base styles target small screens, and larger screens are enhanced with `min-width` media queries only (no `max-width` media queries).
+- Our CSS (`public/styles.css`) is mobile-first: base styles target small screens, and larger screens are enhanced with `min-width` media queries only (no `max-width` media queries).
 - Shared breakpoints: `40rem` (tablet) and `64rem` (desktop).
 - Use relative units (`rem`, `%`, `vw`) and fluid sizing with `clamp()` for spacing and type; no fixed pixel widths on layout containers.
 - Layouts use flexbox and grid that wrap or reflow instead of overflowing; no horizontal scrolling at a `320px` viewport width.
