@@ -5,18 +5,20 @@ import { Main } from './components/main.js'
 import { Layout } from './layout.js'
 
 describe('layout subcomponents', () => {
-  it('renders Header from src/components/header.tsx', () => {
-    expect((<Header />).toString()).toMatch(/^<header[\s>]/)
+  it('renders Header from src/components/header.tsx as a container with the primary nav', () => {
+    const html = (<Header currentPath="/" />).toString()
+    expect(html).toMatch(/^<header class="container">/)
+    expect(html).toMatch(/<header[^>]*><nav aria-label="Primary">[\s\S]*<\/nav><\/header>$/)
   })
 
-  it('renders Main from src/components/main.tsx with its children', () => {
+  it('renders Main from src/components/main.tsx as a container with its children', () => {
     const html = (<Main><p>content</p></Main>).toString()
-    expect(html).toMatch(/^<main[\s>]/)
+    expect(html).toMatch(/^<main class="container">/)
     expect(html).toContain('<p>content</p>')
   })
 
-  it('renders Footer from src/components/footer.tsx', () => {
-    expect((<Footer />).toString()).toMatch(/^<footer[\s>]/)
+  it('renders Footer from src/components/footer.tsx as a container', () => {
+    expect((<Footer />).toString()).toMatch(/^<footer class="container">/)
   })
 })
 
@@ -46,9 +48,16 @@ describe('Layout', () => {
     expect(render('Tea & <Sympathy>')).toContain('<title>Tea &amp; &lt;Sympathy&gt;</title>')
   })
 
-  it('links the stylesheet in the head', () => {
+  it('links Pico before our stylesheet in the head', () => {
     const head = render().split('</head>')[0]
-    expect(head).toContain('<link rel="stylesheet" href="/styles.css"/>')
+    const pico = head.indexOf('<link rel="stylesheet" href="/pico.min.css"/>')
+    const styles = head.indexOf('<link rel="stylesheet" href="/styles.css"/>')
+    expect(pico).toBeGreaterThan(-1)
+    expect(styles).toBeGreaterThan(pico)
+  })
+
+  it('defaults currentPath to /', () => {
+    expect(render()).toContain('<a href="/" aria-current="page">Home</a>')
   })
 
   it('renders header, main, and footer in order', () => {

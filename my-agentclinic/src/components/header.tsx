@@ -1,7 +1,7 @@
-export const Header = () => (
-  <header class="site-header">
-    <a class="site-name" href="/">
-      AgentClinic
-    </a>
+import { Nav } from './nav.js'
+
+export const Header = ({ currentPath }: { currentPath: string }) => (
+  <header class="container">
+    <Nav currentPath={currentPath} />
   </header>
 )

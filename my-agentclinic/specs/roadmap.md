@@ -9,9 +9,9 @@ The app is built in very small phases. Each phase is shippable on its own: the a
 - [x] Add passing Vitest tests for every automated validation check
 
 ## Phase 1: Layout and look
-- [ ] Shared JSX layout with header, nav, and footer
-- [ ] Base CSS: colors, typography, responsive grid
-- [ ] Home page with playful clinic copy
+- [x] Shared JSX layout with header, nav, and footer
+- [x] Base CSS: colors, typography, responsive grid
+- [x] Home page with playful clinic copy
 
 ## Phase 2: Data and catalog
 - [ ] SQLite connection with `better-sqlite3`

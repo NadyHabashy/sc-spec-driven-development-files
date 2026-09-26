@@ -2,6 +2,14 @@
 
 All notable changes to AgentClinic, grouped by date (newest first).
 
+## 2026-09-26
+
+- Implemented Phase 1 (Layout and look): adopted Pico CSS v2 (`@picocss/pico`), served locally at `/pico.min.css` and loaded before `public/styles.css`, which now holds only brand overrides (teal primary color for light and dark themes, fluid heading, 44px nav touch targets).
+- Added a data-driven `Nav` component (`src/components/nav.tsx`) with the site name and a Home link marked `aria-current="page"`; `Layout` takes an optional `currentPath`, and the header, main, and footer use Pico's `container` class.
+- Rewrote the home page with a playful hero and three feature cards (Ailments, Therapies, Appointments) in a new `.feature-grid` that shows one, two, or three columns at the `40rem` and `64rem` breakpoints.
+- Added Vitest coverage for the nav, Pico serving, container classes, stylesheet order, home page cards, and brand stylesheet rules.
+- Added the Phase 1 layout-and-look spec and switched the tech stack's styling choice to Pico CSS.
+
 ## 2026-09-25
 
 - Added a `/changelog` Claude Code skill (`.claude/skills/changelog/`) that creates or updates this changelog from git history, run manually before merging a branch.

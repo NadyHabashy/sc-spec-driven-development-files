@@ -1,39 +1,41 @@
-/* Mobile-first: base styles target small screens; larger screens are
+/* Brand overrides on top of Pico CSS (loaded first from /pico.min.css).
+   Mobile-first: base styles target small screens; larger screens are
    enhanced with min-width media queries at 40rem (tablet) and 64rem (desktop). */
 
 :root {
-  --color-bg: #f7f9fb;
-  --color-surface: #ffffff;
-  --color-text: #1f2933;
-  --color-muted: #616e7c;
-  --color-accent: #2f7d6d;
-  --color-border: #e4e7eb;
-
-  --space-page: clamp(1rem, 4vw, 2rem);
-  --content-width: 60rem;
   --touch-target: 2.75rem;
 }
 
-* {
-  box-sizing: border-box;
+/* Brand teal, tuned per theme so links and buttons stay readable. */
+:root:not([data-theme="dark"]),
+[data-theme="light"] {
+  --pico-primary: #1f6f5f;
+  --pico-primary-background: #1f6f5f;
+  --pico-primary-border: #1f6f5f;
+  --pico-primary-underline: rgba(31, 111, 95, 0.5);
+  --pico-primary-hover: #17564a;
+  --pico-primary-hover-background: #17564a;
+  --pico-primary-hover-border: #17564a;
+  --pico-primary-hover-underline: #17564a;
+  --pico-primary-focus: rgba(31, 111, 95, 0.4);
 }
 
-html {
-  -webkit-text-size-adjust: 100%;
-  text-size-adjust: 100%;
+@media only screen and (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --pico-primary: #5cc4ae;
+    --pico-primary-background: #2f8f7b;
+    --pico-primary-border: #2f8f7b;
+    --pico-primary-underline: rgba(92, 196, 174, 0.5);
+    --pico-primary-hover: #86d6c4;
+    --pico-primary-hover-background: #37a38c;
+    --pico-primary-hover-border: #37a38c;
+    --pico-primary-hover-underline: #86d6c4;
+    --pico-primary-focus: rgba(92, 196, 174, 0.4);
+  }
 }
 
 body {
-  margin: 0;
-  min-height: 100vh;
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  line-height: 1.5;
   overflow-wrap: break-word;
-  color: var(--color-text);
-  background: var(--color-bg);
 }
 
 img,
@@ -45,48 +47,46 @@ video {
 
 h1 {
   font-size: clamp(1.75rem, 1.25rem + 2.5vw, 2.75rem);
-  line-height: 1.2;
 }
 
-.site-header {
-  display: flex;
+/* Let brand and links wrap instead of overflowing at 320px. */
+header nav {
   flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem 1.5rem;
-  padding: 0.5rem var(--space-page);
-  background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
 }
 
-.site-name {
+nav li :where(a, [role="link"]) {
   display: inline-flex;
   align-items: center;
   min-height: var(--touch-target);
-  font-weight: 700;
+}
+
+.site-name {
   font-size: 1.25rem;
-  color: var(--color-accent);
   text-decoration: none;
 }
 
-.site-main {
-  flex: 1;
-  width: 100%;
-  max-width: var(--content-width);
-  margin: 0 auto;
-  padding: 1.5rem var(--space-page);
+.hero .tagline {
+  font-size: clamp(1.1rem, 1rem + 0.5vw, 1.35rem);
+  color: var(--pico-primary);
 }
 
-.site-footer {
-  padding: 1rem var(--space-page);
-  font-size: 0.875rem;
-  color: var(--color-muted);
+.feature-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--pico-spacing);
+}
+
+.feature-grid > article {
+  margin: 0;
+}
+
+footer {
   text-align: center;
-  border-top: 1px solid var(--color-border);
 }
 
 @media (min-width: 40rem) {
-  .site-main {
-    padding-block: 2.5rem;
+  .feature-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -95,7 +95,7 @@ h1 {
     font-size: 1.5rem;
   }
 
-  .site-main {
-    padding-block: 3.5rem;
+  .feature-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
 }

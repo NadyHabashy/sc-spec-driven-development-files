@@ -4,6 +4,10 @@ import { HomePage } from './home.js'
 
 export const app = new Hono()
 
+app.use(
+  '/pico.min.css',
+  serveStatic({ path: './node_modules/@picocss/pico/css/pico.min.css' }),
+)
 app.use('/styles.css', serveStatic({ root: './public' }))
 
 app.get('/', (c) => c.html('<!doctype html>' + <HomePage />))
