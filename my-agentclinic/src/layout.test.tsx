@@ -62,8 +62,11 @@ describe('Layout', () => {
   })
 
   it('requires currentPath and passes it to the nav', () => {
-    // @ts-expect-error currentPath is required so no page silently marks Home as current
-    renderToString(<Layout title="AgentClinic" />)
+    // Type-only check, never called: tsc fails if currentPath becomes optional.
+    const withoutCurrentPath = () =>
+      // @ts-expect-error currentPath is required so no page silently marks Home as current
+      renderToString(<Layout title="AgentClinic" />)
+    expect(withoutCurrentPath).toBeTypeOf('function')
 
     expect(render('AgentClinic', '/')).toMatch(/<a [^>]*aria-current="page"[^>]*>Home<\/a>/)
     expect(render('AgentClinic', '/elsewhere')).not.toContain('aria-current')

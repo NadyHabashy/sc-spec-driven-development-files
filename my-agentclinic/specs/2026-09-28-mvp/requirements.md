@@ -57,8 +57,8 @@ Finish the roadmap (`specs/roadmap.md` Phases 2–6) on the `mvp` branch and del
 |---|---|
 | `GET /agents` | Agents list: name, model, and ailment count, each linking to detail |
 | `GET /agents/:id` | Agent detail: bio, ailments (linked), recommended therapies, and a "Book an appointment" link prefilled with the agent |
-| `GET /ailments` | Ailments catalog: each ailment with its severity and the agents who have it (linked to their detail pages). Each ailment has an `id="ailment-{id}"` anchor |
-| `GET /therapies` | Therapies: each therapy with its duration and the ailments it treats (linked to their anchors) |
+| `GET /ailments` | Ailments catalog: each ailment with its severity, the agents who have it (linked to their detail pages), and the therapies that treat it (or "no known cure"). Each ailment has an `id="ailment-{id}"` anchor |
+| `GET /therapies` | Therapies: each therapy with its duration and the ailments it treats (linked to their anchors). Each therapy has an `id="therapy-{id}"` anchor, which agent detail and the ailments catalog link to |
 | `GET /appointments` | List of upcoming `booked` appointments, soonest first (date, slot, agent, therapy), with a "Book" button. Past and cancelled appointments are in a collapsed `<details>` |
 | `GET /appointments/new` | Booking form (`?agentId=` preselects an agent) |
 | `GET /appointments/slots` | htmx fragment of `<option>`s for `?date=` |

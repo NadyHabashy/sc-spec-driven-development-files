@@ -21,8 +21,8 @@ See `requirements.md` for scope and decisions, and `validation.md` for merge cri
   - It applies each unapplied `NNN_*.sql` in filename order, each in its own transaction, and returns the versions it applied.
   - Add a `db:migrate` script.
 2.4 Write `migrations/001_catalog.sql`: `agents`, `ailments` (with a severity `CHECK`), `therapies`, `agent_ailments`, and `ailment_therapies`, with unique names, composite primary keys, and cascading foreign keys.
-2.5 Create `src/db/seed.ts` exporting `seed(db, now)`. It clears the catalog tables and inserts 6 agents, 8 ailments, and 6 therapies with their links in one transaction, including an agent with no ailments and an ailment no therapy treats. Add `src/db/seed-cli.ts` and a `db:seed` script.
-2.6 Create `src/test/db.ts` with a `testDb(now?)` helper (`openDb(':memory:')`, then `migrate`, then `seed`) and `testApp()`, which returns `createApp({ db, now })` with a fixed date.
+2.5 Create `src/db/seed.ts` exporting `seed(db)` (Phase 3 adds a `now` parameter for appointment dates). It clears the catalog tables and inserts 6 agents, 8 ailments, and 6 therapies with their links in one transaction, including an agent with no ailments and an ailment no therapy treats. Add `src/db/migrate-cli.ts` and `src/db/seed-cli.ts` (which also migrates), run with `tsx` by the `db:migrate` and `db:seed` scripts.
+2.6 Create `src/test/db.ts` with a `testDb({ seeded })` helper (`openDb(':memory:')`, then `migrate`, then `seed` unless `seeded: false`, for empty states) and `testApp(db?)`, which returns `createApp({ db, now })` with a fixed date. Exclude `src/test/` from `tsconfig.build.json`.
 
 ### App wiring
 2.7 Refactor `src/app.tsx` to export `createApp({ db, now = () => new Date() })` and move shared context (`db`, `now`) into Hono `Variables`. Update `src/index.ts` to open the database, migrate, and serve `createApp`. Update the existing tests to use `testApp()`.

@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { app } from './app.js'
+import { testApp } from './test/db.js'
+
+const app = testApp()
 
 describe('GET /', () => {
   it('returns the AgentClinic home page', async () => {
@@ -42,8 +44,17 @@ describe('GET /', () => {
     expect(start).toBeGreaterThan(-1)
     const grid = body.slice(start, body.indexOf('</main>'))
 
-    const headings = [...grid.matchAll(/<article><h2>([^<]+)<\/h2>/g)].map((m) => m[1])
+    const headings = [...grid.matchAll(/<article><h2>([\s\S]*?)<\/h2>/g)].map((m) =>
+      m[1].replace(/<[^>]+>/g, '').trim(),
+    )
     expect(headings).toEqual(['Ailments', 'Therapies', 'Appointments'])
+  })
+
+  it('links the Ailments and Therapies cards to their pages', async () => {
+    const body = await (await app.request('/')).text()
+
+    expect(body).toMatch(/<h2><a href="\/ailments">Ailments<\/a><\/h2>/)
+    expect(body).toMatch(/<h2><a href="\/therapies">Therapies<\/a><\/h2>/)
   })
 })
 

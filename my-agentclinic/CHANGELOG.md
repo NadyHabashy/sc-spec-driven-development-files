@@ -4,6 +4,10 @@ All notable changes to AgentClinic, grouped by date (newest first).
 
 ## 2026-09-28
 
+- Implemented Phase 2 (Data and catalog): SQLite via `better-sqlite3` (`DATABASE_PATH`, default `data/agentclinic.db`), a numbered SQL migration runner (`migrations/`, `npm run db:migrate`), and a deterministic seed of 6 agents, 8 ailments, and 6 therapies (`npm run db:seed`).
+- Added the agents list and agent detail pages (ailments and recommended therapies), the ailments catalog (patients and treating therapies), and the therapies page, each linked to the others and added to the nav.
+- `createApp({ db, now })` replaces the module-level `app`, so tests run against an in-memory database with a fixed clock; the nav now marks a section as current on its sub-pages, and invalid or unknown ids return 404.
+- Linked the home page's Ailments and Therapies cards to their new pages.
 - Added Prettier and ESLint (`typescript-eslint` recommended type-checked rules) with `lint` and `format` scripts; `npm run validate` now runs lint between the type-check and the tests. Prettier skips Markdown and keeps double quotes in CSS.
 - Added `renderToString` (`src/render.ts`) to turn JSX into HTML strings with correct types, and used it in the app and tests.
 - Reformatted the code with Prettier.

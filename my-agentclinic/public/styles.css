@@ -96,14 +96,21 @@ nav li a[aria-current="page"] {
   color: var(--pico-primary);
 }
 
+/* Card grids: .feature-grid on the home page, .card-grid on catalog pages. */
+.card-grid,
 .feature-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--pico-spacing);
 }
 
-.feature-grid > article {
+:where(.card-grid, .feature-grid) > article {
   margin: 0;
+}
+
+/* Anchored cards (e.g. /ailments#ailment-2) scroll clear of the page edge. */
+.card-grid > article[id] {
+  scroll-margin-top: var(--pico-spacing);
 }
 
 footer {
@@ -111,12 +118,13 @@ footer {
 }
 
 @media (min-width: 40rem) {
+  .card-grid,
   .feature-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   /* An odd card out spans the full row instead of sitting alone. */
-  .feature-grid > :last-child:nth-child(odd) {
+  :where(.card-grid, .feature-grid) > :last-child:nth-child(odd) {
     grid-column: 1 / -1;
   }
 }
@@ -126,11 +134,12 @@ footer {
     font-size: 1.5rem;
   }
 
+  .card-grid,
   .feature-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .feature-grid > :last-child:nth-child(odd) {
+  :where(.card-grid, .feature-grid) > :last-child:nth-child(odd) {
     grid-column: auto;
   }
 }

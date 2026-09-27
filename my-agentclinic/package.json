@@ -11,15 +11,20 @@
     "test": "vitest run",
     "validate": "tsc --noEmit && npm run lint && vitest run",
     "lint": "eslint . && prettier --check .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "db:migrate": "tsx src/db/migrate-cli.ts",
+    "db:seed": "tsx src/db/seed-cli.ts"
   },
   "dependencies": {
     "@hono/node-server": "^2.1.1",
     "@picocss/pico": "^2.1.1",
-    "hono": "^4.13.9"
+    "better-sqlite3": "^13.0.3",
+    "hono": "^4.13.9",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@types/better-sqlite3": "^9.6.0",
     "@types/node": "^26.6.2",
     "eslint": "^10.11.0",
     "prettier": "^3.9.9",

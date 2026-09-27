@@ -14,13 +14,13 @@ The app is built in very small phases. Each phase is shippable on its own: the a
 - [x] Home page with playful clinic copy
 
 ## Phase 2: Data and catalog
-- [ ] SQLite connection with `better-sqlite3`
-- [ ] Simple migration runner
-- [ ] Seed script
-- [ ] `agents`, `ailments`, and `therapies` tables and seed data
-- [ ] Agents list page and agent detail page
-- [ ] Ailments catalog page, with agents linked to their ailments
-- [ ] Therapies page, with therapies mapped to the ailments they treat
+- [x] SQLite connection with `better-sqlite3`
+- [x] Simple migration runner
+- [x] Seed script
+- [x] `agents`, `ailments`, and `therapies` tables and seed data
+- [x] Agents list page and agent detail page
+- [x] Ailments catalog page, with agents linked to their ailments
+- [x] Therapies page, with therapies mapped to the ailments they treat
 
 ## Phase 3: Appointments (read)
 - [ ] `appointments` table and seed data
