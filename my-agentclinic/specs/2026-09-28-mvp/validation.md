@@ -21,6 +21,7 @@ Tests use an in-memory SQLite database (`':memory:'`), migrated and seeded per t
 - [ ] Foreign keys are enforced: inserting an `agent_ailments` row for a missing agent throws.
 - [ ] The `severity` and `status` `CHECK` constraints reject invalid values.
 - [ ] The partial unique index rejects a second `booked` appointment for the same date and slot, but allows one when the first is `cancelled`.
+- [ ] With `DATABASE_PATH` unset, the database is the project's `data/agentclinic.db` whatever the working directory (`src/db/connection.test.ts`). `DATABASE_PATH` overrides it.
 - [ ] `seed` inserts exactly 6 agents, 8 ailments, 6 therapies, and 10 appointments. Running it twice gives the same counts.
 - [ ] The seed includes an agent with no ailments, an ailment with no therapies, and 3 `booked` appointments dated today relative to `now`.
 
@@ -34,6 +35,7 @@ Tests use an in-memory SQLite database (`':memory:'`), migrated and seeded per t
 - [ ] Recommended therapies are exactly the distinct therapies treating the agent's ailments (a query-level test).
 - [ ] The agent with no ailments shows the empty state for ailments and for recommended therapies.
 - [ ] `GET /agents/999` and `GET /agents/abc` return the 404 page.
+- [ ] `parseId` rejects zero, signs, decimals, exponents, leading zeros, and ids beyond `Number.MAX_SAFE_INTEGER` (`src/validation/params.test.ts`).
 - [ ] `GET /ailments` lists all 8 ailments with `id="ailment-{id}"` anchors, their severity as text, and linked agents.
 - [ ] `GET /therapies` lists all 6 therapies with the ailments each treats. The untreated ailment is absent from every therapy.
 

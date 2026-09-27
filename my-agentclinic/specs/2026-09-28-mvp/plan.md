@@ -15,7 +15,7 @@ See `requirements.md` for scope and decisions, and `validation.md` for merge cri
 
 ### Database
 2.1 Install `better-sqlite3`, `@types/better-sqlite3` (dev), and `zod`.
-2.2 Create `src/db/connection.ts`: `openDb(path)` creates the parent directory for file paths, opens the database, sets `foreign_keys = ON` and `journal_mode = WAL`, and returns it. It exports a `Db` type. `DATABASE_PATH` defaults to `data/agentclinic.db`. Add `data/` to `.gitignore`.
+2.2 Create `src/db/connection.ts`: `openDb(path)` creates the parent directory for file paths, opens the database, sets `foreign_keys = ON` and `journal_mode = WAL`, and returns it. It exports a `Db` type. `DATABASE_PATH` defaults to the project's `data/agentclinic.db`, resolved with `import.meta.url` rather than the working directory. Add `data/` to `.gitignore` and to ESLint's ignores.
 2.3 Create `src/db/migrate.ts`:
   - `migrate(db)` resolves `migrations/` with `new URL('../../migrations', import.meta.url)` and creates `schema_migrations(version TEXT PRIMARY KEY, applied_at TEXT)`.
   - It applies each unapplied `NNN_*.sql` in filename order, each in its own transaction, and returns the versions it applied.
@@ -26,7 +26,7 @@ See `requirements.md` for scope and decisions, and `validation.md` for merge cri
 
 ### App wiring
 2.7 Refactor `src/app.tsx` to export `createApp({ db, now = () => new Date() })` and move shared context (`db`, `now`) into Hono `Variables`. Update `src/index.ts` to open the database, migrate, and serve `createApp`. Update the existing tests to use `testApp()`.
-2.8 Create `src/validation/params.ts` with a Zod `idParam` (a positive integer from the string). An invalid id calls `c.notFound()`.
+2.8 Create `src/validation/params.ts` with a Zod `idParam` (a positive integer from the string, rejecting values beyond `Number.MAX_SAFE_INTEGER`). An invalid id calls `c.notFound()`.
 2.9 Change `Nav`'s current-link matching to section prefixes: `/` matches exactly, and any other item matches its path and sub-paths.
 
 ### Pages
@@ -39,7 +39,7 @@ See `requirements.md` for scope and decisions, and `validation.md` for merge cri
 2.14 Add any needed styles (card grid reuse, `.overflow-auto` tables) mobile-first in `public/styles.css`.
 
 ### Tests
-2.15 `src/db/migrate.test.ts`, `src/db/seed.test.ts`, `src/agents/agents.test.ts`, `src/ailments/ailments.test.ts`, `src/therapies/therapies.test.ts`, and updated `src/components/nav.test.tsx`, covering the Phase 2 checks in `validation.md`.
+2.15 `src/db/connection.test.ts`, `src/db/migrate.test.ts`, `src/db/seed.test.ts`, `src/validation/params.test.ts`, `src/agents/agents.test.ts`, `src/ailments/ailments.test.ts`, `src/therapies/therapies.test.ts`, and updated `src/components/nav.test.tsx`, covering the Phase 2 checks in `validation.md`.
 
 ## 3. Phase 3: Appointments (read)
 

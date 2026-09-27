@@ -4,6 +4,7 @@ All notable changes to AgentClinic, grouped by date (newest first).
 
 ## 2026-09-28
 
+- Fixed two Phase 2 review findings: the default database path is now resolved from the project (not the working directory), so starting the server from another folder no longer creates an empty database; and route ids larger than `Number.MAX_SAFE_INTEGER` return 404 instead of rounding to a neighboring row.
 - Implemented Phase 2 (Data and catalog): SQLite via `better-sqlite3` (`DATABASE_PATH`, default `data/agentclinic.db`), a numbered SQL migration runner (`migrations/`, `npm run db:migrate`), and a deterministic seed of 6 agents, 8 ailments, and 6 therapies (`npm run db:seed`).
 - Added the agents list and agent detail pages (ailments and recommended therapies), the ailments catalog (patients and treating therapies), and the therapies page, each linked to the others and added to the nav.
 - `createApp({ db, now })` replaces the module-level `app`, so tests run against an in-memory database with a fixed clock; the nav now marks a section as current on its sub-pages, and invalid or unknown ids return 404.
