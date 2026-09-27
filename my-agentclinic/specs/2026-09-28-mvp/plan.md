@@ -5,10 +5,11 @@ See `requirements.md` for scope and decisions, and `validation.md` for merge cri
 ## 1. Tooling
 
 1.1 Install `prettier`, `eslint`, `@eslint/js`, and `typescript-eslint` as dev dependencies.
-1.2 Add `eslint.config.js` (flat config, `recommendedTypeChecked`, ignoring `dist/`) and `.prettierrc` (`semi: false`, `singleQuote: true`, `printWidth: 100`), plus a `.prettierignore` for `dist/`, `data/`, and `package-lock.json`.
+1.2 Add `eslint.config.js` (flat config, `recommendedTypeChecked`, ignoring `dist/`) and `.prettierrc` (`semi: false`, `singleQuote: true`, `printWidth: 100`, with a CSS override keeping double quotes), plus a `.prettierignore` for `dist/`, `data/`, `package-lock.json`, and `*.md`.
 1.3 Add `lint` and `format` scripts, and change `validate` to `tsc --noEmit && npm run lint && vitest run`.
 1.4 Run `npm run format` once, fix any lint errors, and commit the formatting on its own.
 1.5 Extend `src/dependencies.test.ts` to assert the new dev dependencies and that `validate` runs `lint`.
+1.6 Add `renderToString` in `src/render.ts`, which narrows Hono's possibly-async JSX element type to a string and throws on an async component. Use it wherever JSX becomes an HTML string (routes and tests) instead of `.toString()` or `+`, which the type-checked lint rules reject.
 
 ## 2. Phase 2: Data and catalog
 

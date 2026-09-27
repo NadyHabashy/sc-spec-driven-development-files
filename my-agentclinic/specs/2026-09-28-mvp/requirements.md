@@ -89,6 +89,8 @@ Finish the roadmap (`specs/roadmap.md` Phases 2–6) on the `mvp` branch and del
 ### Tooling
 
 - **Prettier + ESLint.** Add `prettier`, `eslint`, and `typescript-eslint` with a flat `eslint.config.js` (recommended type-checked rules) and a `.prettierrc` matching the current style (no semicolons, single quotes, 100 columns). New scripts: `lint` (`eslint . && prettier --check .`) and `format` (`prettier --write .`). `validate` becomes `tsc --noEmit && npm run lint && vitest run`.
+- **Prettier formats code, not Markdown.** `.prettierignore` excludes `*.md`, because Prettier reflows the specs' numbered-step lines into the nested list above them, which changes the plan's meaning. CSS keeps double quotes (a `.prettierrc` override), matching the existing stylesheet and its tests.
+- **JSX is rendered through `renderToString`.** Hono types a JSX element as `HtmlEscapedString | Promise<HtmlEscapedString>`, so the type-checked lint rules reject `.toString()` and string concatenation on it. `src/render.ts` exports `renderToString`, which narrows the element to a string and throws on an async component (no silent failures). Routes and tests use it.
 - **Build output.** `migrations/` stays outside `src/`, so `tsc` doesn't need to copy it. `dist/` resolves it as `../migrations`.
 
 ## Context
