@@ -2,6 +2,13 @@
 
 All notable changes to AgentClinic, grouped by date (newest first).
 
+## 2026-09-28
+
+- Added Prettier and ESLint (`typescript-eslint` recommended type-checked rules) with `lint` and `format` scripts; `npm run validate` now runs lint between the type-check and the tests. Prettier skips Markdown and keeps double quotes in CSS.
+- Added `renderToString` (`src/render.ts`) to turn JSX into HTML strings with correct types, and used it in the app and tests.
+- Reformatted the code with Prettier.
+- Added the MVP spec (`specs/2026-09-28-mvp/`) covering roadmap Phases 2–6, and started work on the `mvp` branch.
+
 ## 2026-09-26
 
 - Implemented Phase 1 (Layout and look): adopted Pico CSS v2 (`@picocss/pico`), served locally at `/pico.min.css` and loaded before `public/styles.css`, which now holds only brand overrides (teal primary color for light and dark themes, fluid heading, 44px nav touch targets).
