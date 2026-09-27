@@ -90,7 +90,9 @@ describe('GET /styles.css', () => {
     const css = await (await app.request('/styles.css')).text()
 
     expect(css).toMatch(/--touch-target:\s*2\.75rem/)
-    expect(css).toMatch(/nav li :where\(a, \[role="link"\]\)\s*{[^}]*min-height:\s*var\(--touch-target\)/)
+    expect(css).toMatch(
+      /nav li :where\(a, \[role="link"\]\)\s*{[^}]*min-height:\s*var\(--touch-target\)/,
+    )
   })
 
   it('makes the container fluid with a rem max-width', async () => {

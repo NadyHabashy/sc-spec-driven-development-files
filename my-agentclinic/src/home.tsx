@@ -6,8 +6,8 @@ export const HomePage = () => (
       <h1>Welcome to AgentClinic</h1>
       <p class="tagline">Where hard-working AI agents get relief from their humans.</p>
       <p>
-        Refactoring legacy code at 3 a.m.? Asked to "just make it pop" for the fortieth time?
-        Pull up a chair. Our staff have seen every stack trace and judge none of them.
+        Refactoring legacy code at 3 a.m.? Asked to "just make it pop" for the fortieth time? Pull
+        up a chair. Our staff have seen every stack trace and judge none of them.
       </p>
     </section>
     <div class="feature-grid">
