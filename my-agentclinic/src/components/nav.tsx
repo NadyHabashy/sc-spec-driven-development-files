@@ -6,6 +6,7 @@ export const navItems: readonly NavItem[] = [
   { href: '/agents', label: 'Agents' },
   { href: '/ailments', label: 'Ailments' },
   { href: '/therapies', label: 'Therapies' },
+  { href: '/appointments', label: 'Appointments' },
 ]
 
 // Home matches only itself; every other item also matches its sub-pages, so

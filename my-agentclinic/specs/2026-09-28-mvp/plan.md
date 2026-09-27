@@ -47,11 +47,12 @@ See `requirements.md` for scope and decisions, and `validation.md` for merge cri
   - `appointments` with `status` and slot `CHECK`s, and FKs to agents and therapies.
   - A partial unique index on `(date, slot) WHERE status = 'booked'`.
   - An index on `(agent_id, date)`.
-3.2 Create `src/appointments/slots.ts` with the `readonly` `SLOTS` list (`09:00`–`16:00`) and a date helper `toIsoDate(date)` for local dates.
+3.2 Create `src/appointments/slots.ts` with the `readonly` `SLOTS` list (`09:00`–`16:00`) and date helpers: `toIsoDate(date)` and `addDays(date, days)` for local dates, and `formatDate(isoDate)` for display ("Thu, Oct 1, 2026", formatted in UTC so the server's time zone can't shift the day).
 3.3 Extend `seed` with 10 appointments relative to `now`: 3 today, 5 in the future, 1 in the past, and 1 cancelled.
 3.4 Create `src/appointments/queries.ts` with `listUpcoming(db, today)` (booked, today or later, ordered by date then slot) and `listPastOrCancelled(db, today)`.
-3.5 `GET /appointments` renders a table (with `<caption>` and `th scope`, inside `.overflow-auto`) of upcoming appointments, linked to agents. Past and cancelled appointments go in a `<details>`. Add Appointments to `navItems`.
-3.6 Tests: `src/appointments/appointments-list.test.ts`, plus the migration test updated for `002`.
+3.5 `GET /appointments` renders a table (with `<caption>` and `th scope`, inside `.overflow-auto`) of upcoming appointments, linked to agents and therapies. Past and cancelled appointments go in a `<details>` with a text Status column. The empty state gets its link to book in Phase 4, when the booking page exists. Add Appointments to `navItems`.
+3.6 In `public/styles.css`, let `header nav ul` wrap as well as `header nav` (five links overflow at `320px`), and keep table `<time>` elements on one line.
+3.7 Tests: `src/appointments/appointments-list.test.ts`, plus the migration, seed, nav, and stylesheet tests updated for `002`, the seeded appointments, the Appointments link, and the new CSS rules.
 
 ## 4. Phase 4: Appointments (booking)
 

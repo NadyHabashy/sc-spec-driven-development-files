@@ -19,7 +19,7 @@ Tests use an in-memory SQLite database (`':memory:'`), migrated and seeded per t
 - [ ] `migrate` on a fresh database applies every file in `migrations/` in order and records each version in `schema_migrations`.
 - [ ] Running `migrate` a second time applies nothing and doesn't throw.
 - [ ] Foreign keys are enforced: inserting an `agent_ailments` row for a missing agent throws.
-- [ ] The `severity` and `status` `CHECK` constraints reject invalid values.
+- [ ] The `severity`, `status`, `slot`, and `date` `CHECK` constraints reject invalid values (including impossible dates such as `2026-13-45` and `2026-02-30`).
 - [ ] The partial unique index rejects a second `booked` appointment for the same date and slot, but allows one when the first is `cancelled`.
 - [ ] With `DATABASE_PATH` unset, the database is the project's `data/agentclinic.db` whatever the working directory (`src/db/connection.test.ts`). `DATABASE_PATH` overrides it.
 - [ ] `seed` inserts exactly 6 agents, 8 ailments, 6 therapies, and 10 appointments. Running it twice gives the same counts.

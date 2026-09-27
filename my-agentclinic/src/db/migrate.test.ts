@@ -10,6 +10,24 @@ const migrationFiles = readdirSync(migrationsDir)
 const count = (db: ReturnType<typeof openDb>, sql: string) =>
   db.prepare<[], { n: number }>(sql).get()?.n
 
+const book = (db: ReturnType<typeof openDb>, slot: string, status = 'booked') =>
+  db
+    .prepare(
+      "INSERT INTO appointments (agent_id, therapy_id, date, slot, status) VALUES (1, 1, '2026-10-01', ?, ?)",
+    )
+    .run(slot, status)
+
+const withCatalog = () => {
+  const db = openDb(':memory:')
+  migrate(db)
+  db.exec(`
+    INSERT INTO agents (id, name, model, bio) VALUES (1, 'Ada Loop', 'Transformer 7B', 'Tired.');
+    INSERT INTO therapies (id, name, description, duration_minutes)
+      VALUES (1, 'Context Detox', 'Flush.', 60);
+  `)
+  return db
+}
+
 describe('migrate', () => {
   it('applies every migration in order on a fresh database and records it', () => {
     const db = openDb(':memory:')
@@ -22,7 +40,7 @@ describe('migrate', () => {
     expect(recorded).toEqual(migrationFiles)
   })
 
-  it('creates the catalog tables', () => {
+  it('creates the catalog and appointments tables', () => {
     const db = openDb(':memory:')
     migrate(db)
 
@@ -37,6 +55,7 @@ describe('migrate', () => {
         'therapies',
         'agent_ailments',
         'ailment_therapies',
+        'appointments',
       ]),
     )
   })
@@ -69,5 +88,31 @@ describe('migrate', () => {
         )
         .run(),
     ).toThrow(/CHECK/)
+  })
+
+  it('rejects an unknown appointment status, slot, or malformed date', () => {
+    const db = withCatalog()
+
+    expect(() => book(db, '09:00', 'maybe')).toThrow(/CHECK/)
+    expect(() => book(db, '08:00')).toThrow(/CHECK/)
+    for (const date of ['2026-13-45', '2026-02-30', '1 Oct 2026', '2026-10-1']) {
+      expect(() =>
+        db
+          .prepare(
+            "INSERT INTO appointments (agent_id, therapy_id, date, slot) VALUES (1, 1, ?, '09:00')",
+          )
+          .run(date),
+      ).toThrow(/CHECK/)
+    }
+  })
+
+  it('allows one booked appointment per date and slot, ignoring cancelled ones', () => {
+    const db = withCatalog()
+    book(db, '09:00', 'cancelled')
+    book(db, '09:00')
+
+    expect(() => book(db, '09:00')).toThrow(/UNIQUE/)
+    expect(() => book(db, '09:00', 'cancelled')).not.toThrow()
+    expect(() => book(db, '10:00')).not.toThrow()
   })
 })

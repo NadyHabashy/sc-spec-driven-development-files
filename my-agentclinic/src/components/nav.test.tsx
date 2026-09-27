@@ -15,9 +15,21 @@ describe('Nav', () => {
     expect(render()).toMatch(/<a class="site-name" href="\/">\s*<strong>AgentClinic<\/strong>/)
   })
 
-  it('lists Home and the catalog pages in this phase', () => {
-    expect(navItems.map(({ href }) => href)).toEqual(['/', '/agents', '/ailments', '/therapies'])
-    expect(navItems.map(({ label }) => label)).toEqual(['Home', 'Agents', 'Ailments', 'Therapies'])
+  it('lists Home, the catalog pages, and Appointments in this phase', () => {
+    expect(navItems.map(({ href }) => href)).toEqual([
+      '/',
+      '/agents',
+      '/ailments',
+      '/therapies',
+      '/appointments',
+    ])
+    expect(navItems.map(({ label }) => label)).toEqual([
+      'Home',
+      'Agents',
+      'Ailments',
+      'Therapies',
+      'Appointments',
+    ])
   })
 
   it('renders one link per nav item', () => {
@@ -45,6 +57,7 @@ describe('Nav', () => {
     expect(current('/agents/3')).toEqual(['Agents'])
     expect(current('/agents/3/dashboard')).toEqual(['Agents'])
     expect(current('/ailments')).toEqual(['Ailments'])
+    expect(current('/appointments/new')).toEqual(['Appointments'])
     expect(current('/agentsmith')).toEqual([])
   })
 

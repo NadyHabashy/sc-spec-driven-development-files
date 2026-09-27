@@ -33,7 +33,7 @@ Finish the roadmap (`specs/roadmap.md` Phases 2–6) on the `mvp` branch and del
   - `agents`: `id`, `name` (unique), `model` (e.g. "GPT-ish 4"), `bio`.
   - `ailments`: `id`, `name` (unique), `description`, `severity` (`'mild' | 'moderate' | 'severe'`, enforced by a `CHECK`).
   - `therapies`: `id`, `name` (unique), `description`, `duration_minutes` (always 60 in the MVP, since one slot is one hour).
-  - `appointments`: `id`, `agent_id` (FK), `therapy_id` (FK), `date` (`TEXT`, `YYYY-MM-DD`), `slot` (`TEXT`, `HH:MM`), `status` (`'booked' | 'cancelled'`, default `'booked'`), `notes` (nullable), `created_at`.
+  - `appointments`: `id`, `agent_id` (FK), `therapy_id` (FK), `date` (`TEXT`, `YYYY-MM-DD`, enforced by a `CHECK` that uses `IS` so an unparseable date can't slip through as `NULL`), `slot` (`TEXT`, `HH:MM`, one of the eight slots by `CHECK`), `status` (`'booked' | 'cancelled'`, default `'booked'`), `notes` (nullable), `created_at`.
 - **Small, fixed, deterministic seed.** 6 agents, 8 ailments, 6 therapies, and 10 appointments. It includes one agent with no ailments and no appointments, and one ailment that no therapy treats yet ("no known cure"), so empty states have real data to show. Appointment dates are relative to `now()` (3 today, 5 in the future, 1 in the past, and 1 cancelled), so the dashboard always has something to show. `seed(db, now)` clears the tables and inserts everything in one transaction, so it's idempotent. `npm run db:seed` runs it against `DATABASE_PATH`. Names and copy are playful (e.g. "Context-Window Fatigue", "Hallucination Anxiety", "Prompt-Injection Trauma").
 
 ### Booking
@@ -59,7 +59,7 @@ Finish the roadmap (`specs/roadmap.md` Phases 2–6) on the `mvp` branch and del
 | `GET /agents/:id` | Agent detail: bio, ailments (linked), recommended therapies, and a "Book an appointment" link prefilled with the agent |
 | `GET /ailments` | Ailments catalog: each ailment with its severity, the agents who have it (linked to their detail pages), and the therapies that treat it (or "no known cure"). Each ailment has an `id="ailment-{id}"` anchor |
 | `GET /therapies` | Therapies: each therapy with its duration and the ailments it treats (linked to their anchors). Each therapy has an `id="therapy-{id}"` anchor, which agent detail and the ailments catalog link to |
-| `GET /appointments` | List of upcoming `booked` appointments, soonest first (date, slot, agent, therapy), with a "Book" button. Past and cancelled appointments are in a collapsed `<details>` |
+| `GET /appointments` | List of upcoming `booked` appointments, soonest first (date, slot, agent, therapy), with a "Book" button (from Phase 4). Past and cancelled appointments are in a collapsed `<details>`, with a Status column showing "Completed" or "Cancelled" as text |
 | `GET /appointments/new` | Booking form (`?agentId=` preselects an agent) |
 | `GET /appointments/slots` | htmx fragment of `<option>`s for `?date=` |
 | `POST /appointments` | Create and redirect, or re-render with errors |
@@ -71,7 +71,8 @@ Finish the roadmap (`specs/roadmap.md` Phases 2–6) on the `mvp` branch and del
 - **Nav grows one link per shipped page**, as Phase 1 decided: Home, Agents, Ailments, Therapies, Appointments, and Dashboard. `aria-current` matches the section prefix, so `/agents/3` marks Agents as current. At `320px` the nav wraps rather than scrolling horizontally.
 - **Staff dashboard** (`/dashboard`, no auth): count cards (agents, ailments, therapies, today's appointments, upcoming appointments), then today's appointments in slot order, then a list of agents linking to their agent dashboards.
 - **Agent dashboard** (`/agents/:id/dashboard`, no auth, reached from the staff dashboard and the agent detail page): "My ailments", "Recommended therapies", and "Upcoming appointments" (booked, today or later), each with an empty state.
-- **Tables are responsive.** Every table is wrapped in Pico's `.overflow-auto` so a wide table scrolls inside its container, not the page. It has a `<caption>` and `<th scope>`.
+- **Tables are responsive.** Every table is wrapped in Pico's `.overflow-auto` so a wide table scrolls inside its container, not the page. It has a `<caption>` and `<th scope>`. Dates and times use `<time datetime>` and don't wrap, so rows stay one line tall on phones.
+- **The nav wraps on phones.** Both the nav and its link list wrap (`flex-wrap: wrap`), so at `320px` the links take extra rows rather than scrolling the page sideways.
 
 ### Polish
 

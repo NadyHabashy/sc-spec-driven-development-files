@@ -106,6 +106,18 @@ describe('GET /styles.css', () => {
     )
   })
 
+  it('lets the nav and its link list wrap on narrow screens', async () => {
+    const css = await (await app.request('/styles.css')).text()
+
+    expect(css).toMatch(/header nav,\s*header nav ul\s*{[^}]*flex-wrap:\s*wrap/)
+  })
+
+  it('keeps table dates and times on one line', async () => {
+    const css = await (await app.request('/styles.css')).text()
+
+    expect(css).toMatch(/td time,\s*th time\s*{[^}]*white-space:\s*nowrap/)
+  })
+
   it('makes the container fluid with a rem max-width', async () => {
     const css = await (await app.request('/styles.css')).text()
 

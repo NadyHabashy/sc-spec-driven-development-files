@@ -4,6 +4,7 @@ import { Hono } from 'hono'
 import { serveStatic } from '@hono/node-server/serve-static'
 import { agentsRoutes } from './agents/routes.js'
 import { ailmentsRoutes } from './ailments/routes.js'
+import { appointmentsRoutes } from './appointments/routes.js'
 import type { Db } from './db/connection.js'
 import type { AppEnv } from './env.js'
 import { HomePage } from './home.js'
@@ -37,6 +38,7 @@ export const createApp = ({ db, now = () => new Date() }: AppOptions) => {
   app.route('/agents', agentsRoutes)
   app.route('/ailments', ailmentsRoutes)
   app.route('/therapies', therapiesRoutes)
+  app.route('/appointments', appointmentsRoutes)
 
   return app
 }

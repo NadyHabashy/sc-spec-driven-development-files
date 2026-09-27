@@ -69,8 +69,10 @@ h1 {
   font-size: clamp(1.75rem, 1.25rem + 2.5vw, 2.75rem);
 }
 
-/* Let brand and links wrap instead of overflowing at 320px. */
-header nav {
+/* Let brand and links wrap, and the links wrap among themselves, instead of
+   overflowing at 320px. */
+header nav,
+header nav ul {
   flex-wrap: wrap;
 }
 
@@ -111,6 +113,13 @@ nav li a[aria-current="page"] {
 /* Anchored cards (e.g. /ailments#ailment-2) scroll clear of the page edge. */
 .card-grid > article[id] {
   scroll-margin-top: var(--pico-spacing);
+}
+
+/* Keep dates and times on one line; on phones the table scrolls sideways
+   inside its .overflow-auto wrapper instead. */
+td time,
+th time {
+  white-space: nowrap;
 }
 
 footer {

@@ -10,7 +10,7 @@ export const fixedNow = () => new Date(2026, 9, 1, 10, 30)
 export const testDb = ({ seeded = true } = {}): Db => {
   const db = openDb(':memory:')
   migrate(db)
-  if (seeded) seed(db)
+  if (seeded) seed(db, fixedNow())
   return db
 }
 

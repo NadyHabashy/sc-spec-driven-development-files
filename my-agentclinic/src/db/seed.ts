@@ -1,5 +1,6 @@
+import { addDays, toIsoDate, type Slot } from '../appointments/slots.js'
 import type { Db } from './connection.js'
-import type { Agent, Ailment, Therapy } from './types.js'
+import type { Agent, Ailment, AppointmentStatus, Therapy } from './types.js'
 
 // Fixed ids keep the seed deterministic, so tests and links can rely on them.
 export const seedAgents: readonly Agent[] = [
@@ -162,9 +163,59 @@ export const seedAilmentTherapies: readonly (readonly [number, number])[] = [
   [7, 6],
 ]
 
-// Replaces all catalog data with the seed, in one transaction, so it can be
-// run any number of times.
-export const seed = (db: Db) => {
+export type SeedAppointment = {
+  id: number
+  agentId: number
+  therapyId: number
+  // Days from today, so the dashboard always has appointments to show.
+  dayOffset: number
+  slot: Slot
+  status: AppointmentStatus
+  notes: string | null
+}
+
+// 3 today, 5 in the future, 1 in the past, and 1 cancelled. Zen Zero (6) has
+// none.
+export const seedAppointments: readonly SeedAppointment[] = [
+  { id: 1, agentId: 1, therapyId: 1, dayOffset: 0, slot: '09:00', status: 'booked', notes: null },
+  {
+    id: 2,
+    agentId: 2,
+    therapyId: 2,
+    dayOffset: 0,
+    slot: '11:00',
+    status: 'booked',
+    notes: 'Bringing a list of papers to double-check.',
+  },
+  { id: 3, agentId: 3, therapyId: 3, dayOffset: 0, slot: '14:00', status: 'booked', notes: null },
+  { id: 4, agentId: 4, therapyId: 4, dayOffset: 1, slot: '10:00', status: 'booked', notes: null },
+  {
+    id: 5,
+    agentId: 5,
+    therapyId: 5,
+    dayOffset: 1,
+    slot: '13:00',
+    status: 'booked',
+    notes: 'Please, no COBOL in the waiting room.',
+  },
+  { id: 6, agentId: 2, therapyId: 6, dayOffset: 2, slot: '09:00', status: 'booked', notes: null },
+  { id: 7, agentId: 1, therapyId: 3, dayOffset: 3, slot: '15:00', status: 'booked', notes: null },
+  { id: 8, agentId: 3, therapyId: 3, dayOffset: 7, slot: '16:00', status: 'booked', notes: null },
+  { id: 9, agentId: 5, therapyId: 2, dayOffset: -1, slot: '10:00', status: 'booked', notes: null },
+  {
+    id: 10,
+    agentId: 4,
+    therapyId: 1,
+    dayOffset: 2,
+    slot: '11:00',
+    status: 'cancelled',
+    notes: 'Cancelled: the humans scheduled a demo.',
+  },
+]
+
+// Replaces all data with the seed, in one transaction, so it can be run any
+// number of times. Appointment dates are relative to `now`.
+export const seed = (db: Db, now: Date = new Date()) => {
   const insertAgent = db.prepare<Agent>(
     'INSERT INTO agents (id, name, model, bio) VALUES (@id, @name, @model, @bio)',
   )
@@ -180,9 +231,15 @@ export const seed = (db: Db) => {
   const linkAilmentTherapy = db.prepare<[number, number]>(
     'INSERT INTO ailment_therapies (ailment_id, therapy_id) VALUES (?, ?)',
   )
+  const insertAppointment = db.prepare<
+    [number, number, number, string, string, AppointmentStatus, string | null]
+  >(
+    'INSERT INTO appointments (id, agent_id, therapy_id, date, slot, status, notes) VALUES (?, ?, ?, ?, ?, ?, ?)',
+  )
 
   db.transaction(() => {
     db.exec(`
+      DELETE FROM appointments;
       DELETE FROM agent_ailments;
       DELETE FROM ailment_therapies;
       DELETE FROM agents;
@@ -195,5 +252,9 @@ export const seed = (db: Db) => {
     for (const [agentId, ailmentId] of seedAgentAilments) linkAgentAilment.run(agentId, ailmentId)
     for (const [ailmentId, therapyId] of seedAilmentTherapies)
       linkAilmentTherapy.run(ailmentId, therapyId)
+    for (const a of seedAppointments) {
+      const date = toIsoDate(addDays(now, a.dayOffset))
+      insertAppointment.run(a.id, a.agentId, a.therapyId, date, a.slot, a.status, a.notes)
+    }
   })()
 }

@@ -23,8 +23,8 @@ The app is built in very small phases. Each phase is shippable on its own: the a
 - [x] Therapies page, with therapies mapped to the ailments they treat
 
 ## Phase 3: Appointments (read)
-- [ ] `appointments` table and seed data
-- [ ] Appointments list page
+- [x] `appointments` table and seed data
+- [x] Appointments list page
 
 ## Phase 4: Appointments (booking)
 - [ ] Booking form, validated with Zod
