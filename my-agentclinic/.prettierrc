@@ -1,0 +1,6 @@
+{
+  "semi": false,
+  "singleQuote": true,
+  "printWidth": 100,
+  "overrides": [{ "files": "*.css", "options": { "singleQuote": false } }]
+}

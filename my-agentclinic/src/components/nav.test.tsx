@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest'
+import { renderToString } from '../render.js'
 import { Nav, navItems } from './nav.js'
 
 const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
 describe('Nav', () => {
-  const render = (currentPath = '/') => (<Nav currentPath={currentPath} />).toString()
+  const render = (currentPath = '/') => renderToString(<Nav currentPath={currentPath} />)
 
   it('renders a primary nav landmark', () => {
     expect(render()).toMatch(/^<nav aria-label="Primary">/)

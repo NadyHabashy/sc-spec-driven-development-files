@@ -3,32 +3,37 @@ import { Footer } from './components/footer.js'
 import { Header } from './components/header.js'
 import { Main } from './components/main.js'
 import { Layout } from './layout.js'
+import { renderToString } from './render.js'
 
 describe('layout subcomponents', () => {
   it('renders Header from src/components/header.tsx as a container with the primary nav', () => {
-    const html = (<Header currentPath="/" />).toString()
+    const html = renderToString(<Header currentPath="/" />)
     expect(html).toMatch(/^<header class="container">/)
     expect(html).toMatch(/<header[^>]*><nav aria-label="Primary">[\s\S]*<\/nav><\/header>$/)
   })
 
   it('renders Main from src/components/main.tsx as a container with its children', () => {
-    const html = (<Main><p>content</p></Main>).toString()
+    const html = renderToString(
+      <Main>
+        <p>content</p>
+      </Main>,
+    )
     expect(html).toMatch(/^<main class="container">/)
     expect(html).toContain('<p>content</p>')
   })
 
   it('renders Footer from src/components/footer.tsx as a container', () => {
-    expect((<Footer />).toString()).toMatch(/^<footer class="container">/)
+    expect(renderToString(<Footer />)).toMatch(/^<footer class="container">/)
   })
 })
 
 describe('Layout', () => {
   const render = (title = 'AgentClinic', currentPath = '/') =>
-    (
+    renderToString(
       <Layout title={title} currentPath={currentPath}>
         <p>page content</p>
-      </Layout>
-    ).toString()
+      </Layout>,
+    )
 
   it('renders an English HTML document', () => {
     expect(render()).toMatch(/^<html lang="en">/)
@@ -58,7 +63,7 @@ describe('Layout', () => {
 
   it('requires currentPath and passes it to the nav', () => {
     // @ts-expect-error currentPath is required so no page silently marks Home as current
-    ;(<Layout title="AgentClinic" />).toString()
+    renderToString(<Layout title="AgentClinic" />)
 
     expect(render('AgentClinic', '/')).toMatch(/<a [^>]*aria-current="page"[^>]*>Home<\/a>/)
     expect(render('AgentClinic', '/elsewhere')).not.toContain('aria-current')
