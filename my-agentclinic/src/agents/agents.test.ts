@@ -47,6 +47,12 @@ describe('GET /agents/:id', () => {
     expect(body).toMatch(/<a [^>]*aria-current="page"[^>]*>Agents<\/a>/)
   })
 
+  it('links to the booking form with the agent preselected', async () => {
+    expect(await html('/agents/2')).toContain(
+      '<a href="/appointments/new?agentId=2" role="button">Book an appointment</a>',
+    )
+  })
+
   it('lists each recommended therapy once', async () => {
     // Ada Loop: Context-Window Fatigue and Sycophancy Syndrome, two
     // therapies each.

@@ -27,9 +27,10 @@ The app is built in very small phases. Each phase is shippable on its own: the a
 - [x] Appointments list page
 
 ## Phase 4: Appointments (booking)
-- [ ] Booking form, validated with Zod
-- [ ] Create an appointment and confirm it
-- [ ] Prevent double-booking
+- [x] Booking form, validated with Zod
+- [x] Create an appointment and confirm it
+- [x] Prevent double-booking
+- [x] Cancel an appointment
 
 ## Phase 5: Dashboard
 - [ ] Staff dashboard: today's appointments and counts

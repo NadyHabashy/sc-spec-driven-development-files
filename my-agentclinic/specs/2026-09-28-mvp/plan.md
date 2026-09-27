@@ -57,7 +57,7 @@ See `requirements.md` for scope and decisions, and `validation.md` for merge cri
 ## 4. Phase 4: Appointments (booking)
 
 ### Form and validation
-4.1 Create `src/appointments/schema.ts`: `bookingSchema` (Zod) for `agentId`, `therapyId`, `date`, `slot`, and `notes`. It takes `today` and `currentTime` through a factory, `bookingSchema(now)`, so past-date and past-slot rules are testable. Export `BookingInput = z.infer<…>`.
+4.1 Create `src/appointments/schema.ts`: `bookingSchema` (Zod) for `agentId`, `therapyId`, `date`, `slot`, and `notes`. It takes `today` and `currentTime` through a factory, `bookingSchema(now)`, so past-date and past-slot rules are testable. The started-slot rule applies only to today's date, so a past date gets one error, not two. Ids reuse `positiveId(message)` from `src/validation/params.ts`. Export `BookingInput = z.infer<…>` and `fieldErrors`, which keeps the first message per field.
 4.2 Create a `BookingForm` component. Every control has a `<label>`. Invalid fields get `aria-invalid` and `aria-describedby` pointing to their error message. An error summary (`role="alert"`) at the top links to each field. Submitted values are re-filled.
 4.3 `GET /appointments/new` renders the form (`?agentId=` preselects the agent, and today is the default date).
 
@@ -66,13 +66,13 @@ See `requirements.md` for scope and decisions, and `validation.md` for merge cri
   - Parse the form with `bookingSchema`, and check that the agent and therapy exist and the slot is free.
   - Insert and redirect with 303 to `/appointments/:id?booked=1`.
   - On a validation error, re-render with 400. On a taken slot, re-render with 409, and also catch `SQLITE_CONSTRAINT_UNIQUE` from the insert and map it to 409.
-4.5 `GET /appointments/:id` shows the appointment details, a confirmation banner when `booked=1`, and a Cancel form (a POST button) while it's booked and upcoming.
-4.6 `POST /appointments/:id/cancel`: validate the id, reject cancelled or past appointments with a message (409), otherwise set `status = 'cancelled'` and redirect with 303.
+4.5 `GET /appointments/:id` shows the appointment details, a confirmation banner (`role="status"`) when `booked=1` or `cancelled=1`, and a Cancel form (a POST button) while it's booked and its slot hasn't started.
+4.6 `POST /appointments/:id/cancel`: validate the id, reject cancelled appointments and ones whose slot has started with a message (409), otherwise set `status = 'cancelled'` (only if still booked, so a concurrent cancel also gets the 409) and redirect with 303 to `/appointments/:id?cancelled=1`.
 4.7 Add the "Book an appointment" link to agent detail and a "Book" button to `/appointments`.
 
 ### htmx
 4.8 Install `htmx.org`. Serve `htmx.org/dist/htmx.min.js` at `/htmx.min.js`, resolved with `createRequire` like Pico. Add an optional `scripts` prop to `Layout` so only the booking page loads it (`defer`).
-4.9 `GET /appointments/slots?date=` validates the date and returns `<option>` elements for all eight slots, with taken ones `disabled` and labelled "(taken)". The date input gets `hx-get`, `hx-target` (the slot `<select>`), and `hx-trigger="change"`. Without JavaScript, the full slot list still works.
+4.9 `GET /appointments/slots?date=&slot=` validates the date and returns the placeholder plus `<option>` elements for all eight slots, with taken ones `disabled` and labelled "(taken)", and slots that have already started `disabled` and labelled "(past)". A still-free `slot` stays selected. The date input gets `hx-get`, `hx-target="#slot"`, `hx-include="#slot"`, and `hx-trigger="load, change"`, so availability also loads for the default date. The server-rendered list never disables slots (it can't know which date the user will pick), so without JavaScript the full slot list still works and the server rejects a taken one.
 4.10 Update `specs/tech-stack.md`'s Interactivity row to say htmx is used, served locally, for the booking slot picker.
 
 ### Tests

@@ -13,7 +13,7 @@ A server-side TypeScript web app: **Node.js + Hono** with server-rendered JSX, b
 | Web framework | [Hono](https://hono.dev) with `@hono/node-server` | Small, fast, well-typed, widely used, built-in JSX rendering |
 | Views | Hono JSX (server-rendered) | Type-checked templates with no frontend build step |
 | Styling | [Pico CSS](https://picocss.com) v2 (`@picocss/pico`, served locally from npm), plus brand overrides in `public/styles.css` (custom properties, grid, flexbox) | Attractive, responsive, and accessible defaults for semantic HTML with few classes and no build step |
-| Interactivity | Progressive enhancement; add [htmx](https://htmx.org) only if needed | Keeps client JS minimal |
+| Interactivity | Progressive enhancement with [htmx](https://htmx.org) (`htmx.org`, served locally from npm at `/htmx.min.js`), loaded only on pages that need it; today that's the booking form's slot picker | Keeps client JS minimal; every page still works without JavaScript |
 | Database | SQLite | Zero-config, file-based, reliable for this scale |
 | DB access | `better-sqlite3` | Simple, synchronous, popular |
 | Validation | Zod | Validate form input and share types |

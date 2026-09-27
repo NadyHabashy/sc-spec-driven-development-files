@@ -72,6 +72,16 @@ describe('Layout', () => {
     expect(render('AgentClinic', '/elsewhere')).not.toContain('aria-current')
   })
 
+  it('adds deferred page scripts to the head only when given', () => {
+    expect(render()).not.toContain('<script')
+
+    const html = renderToString(
+      <Layout title="AgentClinic" currentPath="/" scripts={['/htmx.min.js']} />,
+    )
+    const head = html.split('</head>')[0]
+    expect(head).toContain('<script src="/htmx.min.js" defer=""></script>')
+  })
+
   it('renders header, main, and footer in order', () => {
     const html = render()
     const header = html.indexOf('<header')

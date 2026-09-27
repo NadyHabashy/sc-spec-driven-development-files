@@ -115,6 +115,28 @@ nav li a[aria-current="page"] {
   scroll-margin-top: var(--pico-spacing);
 }
 
+/* Confirmation and error messages: a colored edge plus a bold lead-in or
+   heading, so they don't rely on color alone. */
+.notice,
+.error-summary {
+  border-inline-start: 0.35rem solid var(--pico-primary-background);
+}
+
+.error-summary {
+  border-inline-start-color: var(--pico-form-element-invalid-border-color);
+}
+
+.error-summary h2 {
+  font-size: 1.25rem;
+}
+
+/* Date and time side by side once there's room. */
+.grid-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  column-gap: var(--pico-spacing);
+}
+
 /* Keep dates and times on one line; on phones the table scrolls sideways
    inside its .overflow-auto wrapper instead. */
 td time,
@@ -127,6 +149,10 @@ footer {
 }
 
 @media (min-width: 40rem) {
+  .grid-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .card-grid,
   .feature-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));

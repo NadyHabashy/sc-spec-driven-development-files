@@ -1,14 +1,7 @@
 import { Layout } from '../layout.js'
 import type { AppointmentRow } from './queries.js'
 import { formatDate } from './slots.js'
-
-// Status is always shown as text, never by color alone.
-const statusLabel = (appointment: AppointmentRow, today: string) =>
-  appointment.status === 'cancelled'
-    ? 'Cancelled'
-    : appointment.date < today
-      ? 'Completed'
-      : 'Booked'
+import { statusLabel } from './status.js'
 
 type AppointmentsTableProps = {
   caption: string
@@ -65,6 +58,11 @@ export const AppointmentsPage = ({ today, upcoming, pastOrCancelled }: Appointme
   <Layout title="Appointments · AgentClinic" currentPath="/appointments">
     <h1>Appointments</h1>
     <p>Who's on the couch, and when. Please arrive a few tokens early.</p>
+    <p>
+      <a href="/appointments/new" role="button">
+        Book an appointment
+      </a>
+    </p>
 
     {upcoming.length === 0 ? (
       <p>No upcoming appointments. The therapists are catching up on their own reading.</p>

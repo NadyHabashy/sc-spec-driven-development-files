@@ -4,6 +4,9 @@ All notable changes to AgentClinic, grouped by date (newest first).
 
 ## 2026-09-28
 
+- Implemented Phase 4 (Appointments, booking): a booking form at `/appointments/new` validated with Zod, with an error summary and per-field messages; bookings redirect to a confirmation page, a slot can't be double-booked (checked in the route and guarded by the unique index), and upcoming appointments can be cancelled, freeing the slot.
+- Added htmx (served locally, loaded only on the booking page) to show which slots are taken or already past when a date is picked; without JavaScript the form still works and the server rejects taken slots.
+- Added "Book an appointment" buttons to agent pages and the appointments list, and recorded htmx in `specs/tech-stack.md`.
 - Implemented Phase 3 (Appointments, read): an `appointments` migration (slot, status, and date `CHECK`s, and a partial unique index so a slot holds one booked appointment), 10 seeded appointments dated relative to today, and an `/appointments` page listing upcoming appointments, with past and cancelled ones in a collapsible section. Appointments is now in the nav.
 - Fixed the nav overflowing sideways at phone width now that it has five links, and kept table dates and times on one line.
 - Fixed two Phase 2 review findings: the default database path is now resolved from the project (not the working directory), so starting the server from another folder no longer creates an empty database; and route ids larger than `Number.MAX_SAFE_INTEGER` return 404 instead of rounding to a neighboring row.

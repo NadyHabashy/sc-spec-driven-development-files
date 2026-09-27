@@ -59,13 +59,13 @@ Tests use an in-memory SQLite database (`':memory:'`), migrated and seeded per t
 - [ ] An invalid `POST` returns 400, keeps the submitted values, and shows an error summary with `role="alert"`. Invalid fields have `aria-invalid="true"` and `aria-describedby`.
 - [ ] A `POST` for a taken date and slot returns 409 with the "slot taken" message and inserts nothing.
 - [ ] An unknown `agentId` or `therapyId` returns 400, not 500.
-- [ ] `GET /appointments/slots?date=` returns 8 `<option>`s with taken slots `disabled`. An invalid date returns 400.
+- [ ] `GET /appointments/slots?date=` returns the placeholder plus 8 slot `<option>`s, with taken slots `disabled` "(taken)" and today's started slots `disabled` "(past)". Cancelled appointments don't block a slot. An invalid date returns 400.
 - [ ] `GET /htmx.min.js` returns 200 with a JavaScript `Content-Type`. Only the booking page includes the script tag.
 
 ### Cancel (`src/appointments/cancel.test.ts`)
 - [ ] `POST /appointments/:id/cancel` on an upcoming booked appointment returns 303 and sets its status to `cancelled`.
 - [ ] After cancelling, the same slot can be booked again.
-- [ ] Cancelling a cancelled or past appointment returns 409 and changes nothing.
+- [ ] Cancelling a cancelled appointment, or one whose slot has started, returns 409 and changes nothing.
 - [ ] `GET /appointments/:id` shows the Cancel button only for booked, upcoming appointments.
 
 ### Dashboard (`src/dashboard/dashboard.test.ts`)

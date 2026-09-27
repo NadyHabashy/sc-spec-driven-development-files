@@ -1,5 +1,6 @@
+import Database from 'better-sqlite3'
 import type { Db } from '../db/connection.js'
-import type { Appointment } from '../db/types.js'
+import type { Appointment, Ref } from '../db/types.js'
 
 // An appointment with the names needed to show and link it.
 export type AppointmentRow = Appointment & { agent_name: string; therapy_name: string }
@@ -29,3 +30,70 @@ export const listPastOrCancelled = (db: Db, today: string): AppointmentRow[] =>
        ORDER BY appointments.date DESC, appointments.slot DESC`,
     )
     .all(today)
+
+export const getAppointment = (db: Db, id: number): AppointmentRow | undefined =>
+  db.prepare<[number], AppointmentRow>(`${select} WHERE appointments.id = ?`).get(id)
+
+// The slots on `date` (YYYY-MM-DD) that already hold a booked appointment.
+export const bookedSlots = (db: Db, date: string): Set<string> =>
+  new Set(
+    db
+      .prepare<[string], { slot: string }>(
+        "SELECT slot FROM appointments WHERE date = ? AND status = 'booked'",
+      )
+      .all(date)
+      .map((row) => row.slot),
+  )
+
+export const agentRefs = (db: Db): Ref[] =>
+  db.prepare<[], Ref>('SELECT id, name FROM agents ORDER BY name').all()
+
+export const therapyRefs = (db: Db): Ref[] =>
+  db.prepare<[], Ref>('SELECT id, name FROM therapies ORDER BY name').all()
+
+const exists = (db: Db, table: 'agents' | 'therapies', id: number) =>
+  db.prepare<[number], { id: number }>(`SELECT id FROM ${table} WHERE id = ?`).get(id) !== undefined
+
+export const agentExists = (db: Db, id: number) => exists(db, 'agents', id)
+export const therapyExists = (db: Db, id: number) => exists(db, 'therapies', id)
+
+export type NewAppointment = {
+  agentId: number
+  therapyId: number
+  date: string
+  slot: string
+  notes: string | null
+}
+
+// Books a slot and returns the new id, or 'taken' if the slot already holds a
+// booked appointment. The unique index is the final guard, so a booking that
+// races past the route's own check still can't double-book.
+export const createAppointment = (db: Db, appointment: NewAppointment): number | 'taken' => {
+  try {
+    const result = db
+      .prepare<[number, number, string, string, string | null]>(
+        'INSERT INTO appointments (agent_id, therapy_id, date, slot, notes) VALUES (?, ?, ?, ?, ?)',
+      )
+      .run(
+        appointment.agentId,
+        appointment.therapyId,
+        appointment.date,
+        appointment.slot,
+        appointment.notes,
+      )
+    return Number(result.lastInsertRowid)
+  } catch (error) {
+    if (error instanceof Database.SqliteError && error.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+      return 'taken'
+    }
+    throw error
+  }
+}
+
+// Cancels a booked appointment. Returns false if it wasn't booked.
+export const cancelAppointment = (db: Db, id: number): boolean =>
+  db
+    .prepare<[number]>(
+      "UPDATE appointments SET status = 'cancelled' WHERE id = ? AND status = 'booked'",
+    )
+    .run(id).changes === 1

@@ -33,3 +33,22 @@ export const formatDate = (isoDate: string) =>
     year: 'numeric',
     timeZone: 'UTC',
   })
+
+// The local time of day as HH:MM, comparable with slot strings.
+export const toTime = (date: Date) => `${pad(date.getHours())}:${pad(date.getMinutes())}`
+
+// A slot has started once its start time has passed; every slot on an earlier
+// date has too.
+export const hasStarted = (date: string, slot: string, now: Date) => {
+  const today = toIsoDate(now)
+  return date < today || (date === today && slot <= toTime(now))
+}
+
+const isoDate = /^\d{4}-\d{2}-\d{2}$/
+
+// True for a real calendar date written as YYYY-MM-DD (not 2026-02-30).
+export const isIsoDate = (value: string) => {
+  if (!isoDate.test(value)) return false
+  const date = new Date(`${value}T00:00:00Z`)
+  return !Number.isNaN(date.getTime()) && date.toISOString().startsWith(value)
+}

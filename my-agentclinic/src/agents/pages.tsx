@@ -44,6 +44,11 @@ export const AgentDetailPage = ({ agent, ailments, therapies }: AgentDetailPageP
       <small>{agent.model}</small>
     </p>
     <p>{agent.bio}</p>
+    <p>
+      <a href={`/appointments/new?agentId=${agent.id}`} role="button">
+        Book an appointment
+      </a>
+    </p>
 
     <section>
       <h2>Ailments</h2>

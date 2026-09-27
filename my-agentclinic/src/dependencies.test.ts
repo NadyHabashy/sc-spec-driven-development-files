@@ -8,8 +8,16 @@ const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url),
 }
 
 describe('package.json', () => {
-  it('lists @picocss/pico as a runtime dependency', () => {
-    expect(pkg.dependencies).toHaveProperty('@picocss/pico')
+  it.each(['@picocss/pico', 'better-sqlite3', 'zod', 'htmx.org'])(
+    'lists %s as a runtime dependency',
+    (name) => {
+      expect(pkg.dependencies).toHaveProperty(name)
+    },
+  )
+
+  it('has db:migrate and db:seed scripts', () => {
+    expect(pkg.scripts).toHaveProperty('db:migrate')
+    expect(pkg.scripts).toHaveProperty('db:seed')
   })
 
   it.each(['prettier', 'eslint', '@eslint/js', 'typescript-eslint'])(

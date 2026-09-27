@@ -76,6 +76,7 @@ describe('GET /appointments', () => {
     const body = await (await testApp(db).request('/appointments')).text()
 
     expect(body).toContain('No upcoming appointments.')
+    expect(body).toContain('<a href="/appointments/new" role="button">Book an appointment</a>')
     expect(body).not.toContain('<table>')
     expect(body).not.toContain('<details>')
   })

@@ -13,7 +13,9 @@ import { therapiesRoutes } from './therapies/routes.js'
 
 // Resolve static assets from this module, not the working directory, so the
 // app works however it's started (src/ via tsx or dist/ via node).
-const picoPath = createRequire(import.meta.url).resolve('@picocss/pico/css/pico.min.css')
+const require = createRequire(import.meta.url)
+const picoPath = require.resolve('@picocss/pico/css/pico.min.css')
+const htmxPath = require.resolve('htmx.org/dist/htmx.min.js')
 const publicDir = fileURLToPath(new URL('../public', import.meta.url))
 
 export type AppOptions = {
@@ -27,6 +29,7 @@ export const createApp = ({ db, now = () => new Date() }: AppOptions) => {
 
   app.use('/pico.min.css', serveStatic({ path: picoPath }))
   app.use('/styles.css', serveStatic({ root: publicDir }))
+  app.use('/htmx.min.js', serveStatic({ path: htmxPath }))
 
   app.use(async (c, next) => {
     c.set('db', db)
