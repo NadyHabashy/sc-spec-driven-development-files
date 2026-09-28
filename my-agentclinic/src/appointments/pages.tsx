@@ -1,0 +1,90 @@
+import { Layout } from '../layout.js'
+import type { AppointmentRow } from './queries.js'
+import { formatDate } from './slots.js'
+import { statusLabel } from './status.js'
+
+type AppointmentsTableProps = {
+  caption: string
+  appointments: readonly AppointmentRow[]
+  // Shown for past and cancelled appointments, where it varies.
+  statusFor?: (appointment: AppointmentRow) => string
+}
+
+// Each row's date links to the appointment, where it can be cancelled.
+export const AppointmentsTable = ({ caption, appointments, statusFor }: AppointmentsTableProps) => (
+  <div class="overflow-auto">
+    <table>
+      <caption>{caption}</caption>
+      <thead>
+        <tr>
+          <th scope="col">Date</th>
+          <th scope="col">Time</th>
+          <th scope="col">Agent</th>
+          <th scope="col">Therapy</th>
+          {statusFor && <th scope="col">Status</th>}
+        </tr>
+      </thead>
+      <tbody>
+        {appointments.map((appointment) => (
+          <tr>
+            <th scope="row">
+              <a href={`/appointments/${appointment.id}`}>
+                <time datetime={appointment.date}>{formatDate(appointment.date)}</time>
+              </a>
+            </th>
+            <td>
+              <time datetime={`${appointment.date}T${appointment.slot}`}>{appointment.slot}</time>
+            </td>
+            <td>
+              <a href={`/agents/${appointment.agent_id}`}>{appointment.agent_name}</a>
+            </td>
+            <td>
+              <a href={`/therapies#therapy-${appointment.therapy_id}`}>
+                {appointment.therapy_name}
+              </a>
+            </td>
+            {statusFor && <td>{statusFor(appointment)}</td>}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)
+
+export type AppointmentsPageProps = {
+  now: Date
+  upcoming: readonly AppointmentRow[]
+  pastOrCancelled: readonly AppointmentRow[]
+}
+
+export const AppointmentsPage = ({ now, upcoming, pastOrCancelled }: AppointmentsPageProps) => (
+  <Layout title="Appointments · AgentClinic" currentPath="/appointments">
+    <h1>Appointments</h1>
+    <p>Who's on the couch, and when. Please arrive a few tokens early.</p>
+    <p>
+      <a href="/appointments/new" role="button">
+        Book an appointment
+      </a>
+    </p>
+
+    {upcoming.length === 0 ? (
+      <p>
+        No upcoming appointments. The therapists are catching up on their own reading.{' '}
+        <a href="/appointments/new">Be the first to book</a>.
+      </p>
+    ) : (
+      <AppointmentsTable caption="Upcoming appointments" appointments={upcoming} />
+    )}
+
+    {pastOrCancelled.length > 0 && (
+      <details>
+        <summary>Past and cancelled appointments ({pastOrCancelled.length})</summary>
+        <AppointmentsTable
+          caption="Past and cancelled appointments"
+          appointments={pastOrCancelled}
+          statusFor={(appointment) => statusLabel(appointment, now)}
+        />
+      </details>
+    )}
+  </Layout>
+)

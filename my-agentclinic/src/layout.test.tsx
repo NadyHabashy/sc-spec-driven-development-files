@@ -3,32 +3,37 @@ import { Footer } from './components/footer.js'
 import { Header } from './components/header.js'
 import { Main } from './components/main.js'
 import { Layout } from './layout.js'
+import { renderToString } from './render.js'
 
 describe('layout subcomponents', () => {
   it('renders Header from src/components/header.tsx as a container with the primary nav', () => {
-    const html = (<Header currentPath="/" />).toString()
+    const html = renderToString(<Header currentPath="/" />)
     expect(html).toMatch(/^<header class="container">/)
     expect(html).toMatch(/<header[^>]*><nav aria-label="Primary">[\s\S]*<\/nav><\/header>$/)
   })
 
   it('renders Main from src/components/main.tsx as a container with its children', () => {
-    const html = (<Main><p>content</p></Main>).toString()
-    expect(html).toMatch(/^<main class="container">/)
+    const html = renderToString(
+      <Main>
+        <p>content</p>
+      </Main>,
+    )
+    expect(html).toMatch(/^<main class="container" id="main">/)
     expect(html).toContain('<p>content</p>')
   })
 
   it('renders Footer from src/components/footer.tsx as a container', () => {
-    expect((<Footer />).toString()).toMatch(/^<footer class="container">/)
+    expect(renderToString(<Footer />)).toMatch(/^<footer class="container">/)
   })
 })
 
 describe('Layout', () => {
   const render = (title = 'AgentClinic', currentPath = '/') =>
-    (
+    renderToString(
       <Layout title={title} currentPath={currentPath}>
         <p>page content</p>
-      </Layout>
-    ).toString()
+      </Layout>,
+    )
 
   it('renders an English HTML document', () => {
     expect(render()).toMatch(/^<html lang="en">/)
@@ -57,11 +62,32 @@ describe('Layout', () => {
   })
 
   it('requires currentPath and passes it to the nav', () => {
-    // @ts-expect-error currentPath is required so no page silently marks Home as current
-    ;(<Layout title="AgentClinic" />).toString()
+    // Type-only check, never called: tsc fails if currentPath becomes optional.
+    const withoutCurrentPath = () =>
+      // @ts-expect-error currentPath is required so no page silently marks Home as current
+      renderToString(<Layout title="AgentClinic" />)
+    expect(withoutCurrentPath).toBeTypeOf('function')
 
     expect(render('AgentClinic', '/')).toMatch(/<a [^>]*aria-current="page"[^>]*>Home<\/a>/)
     expect(render('AgentClinic', '/elsewhere')).not.toContain('aria-current')
+  })
+
+  it('adds deferred page scripts to the head only when given', () => {
+    expect(render()).not.toContain('<script')
+
+    const html = renderToString(
+      <Layout title="AgentClinic" currentPath="/" scripts={['/htmx.min.js']} />,
+    )
+    const head = html.split('</head>')[0]
+    expect(head).toContain('<script src="/htmx.min.js" defer=""></script>')
+  })
+
+  it('starts with a skip link to the main content', () => {
+    const html = render()
+    const body = html.slice(html.indexOf('<body>') + '<body>'.length)
+
+    expect(body).toMatch(/^<a class="skip-link" href="#main">Skip to content<\/a><header/)
+    expect(html).toContain('<main class="container" id="main">')
   })
 
   it('renders header, main, and footer in order', () => {

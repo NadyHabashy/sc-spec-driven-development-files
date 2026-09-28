@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { app } from './app.js'
+import { testApp } from './test/db.js'
+
+const app = testApp()
 
 describe('GET /', () => {
   it('returns the AgentClinic home page', async () => {
@@ -42,8 +44,17 @@ describe('GET /', () => {
     expect(start).toBeGreaterThan(-1)
     const grid = body.slice(start, body.indexOf('</main>'))
 
-    const headings = [...grid.matchAll(/<article><h2>([^<]+)<\/h2>/g)].map((m) => m[1])
+    const headings = [...grid.matchAll(/<article><h2>([\s\S]*?)<\/h2>/g)].map((m) =>
+      m[1].replace(/<[^>]+>/g, '').trim(),
+    )
     expect(headings).toEqual(['Ailments', 'Therapies', 'Appointments'])
+  })
+
+  it('links the Ailments and Therapies cards to their pages', async () => {
+    const body = await (await app.request('/')).text()
+
+    expect(body).toMatch(/<h2><a href="\/ailments">Ailments<\/a><\/h2>/)
+    expect(body).toMatch(/<h2><a href="\/therapies">Therapies<\/a><\/h2>/)
   })
 })
 
@@ -90,7 +101,35 @@ describe('GET /styles.css', () => {
     const css = await (await app.request('/styles.css')).text()
 
     expect(css).toMatch(/--touch-target:\s*2\.75rem/)
-    expect(css).toMatch(/nav li :where\(a, \[role="link"\]\)\s*{[^}]*min-height:\s*var\(--touch-target\)/)
+    expect(css).toMatch(
+      /nav li :where\(a, \[role="link"\]\)\s*{[^}]*min-height:\s*var\(--touch-target\)/,
+    )
+  })
+
+  it('lets the nav and its link list wrap on narrow screens', async () => {
+    const css = await (await app.request('/styles.css')).text()
+
+    expect(css).toMatch(/header nav,\s*header nav ul\s*{[^}]*flex-wrap:\s*wrap/)
+  })
+
+  it('gives details toggles and the skip link a touch target', async () => {
+    const css = await (await app.request('/styles.css')).text()
+
+    expect(css).toMatch(/details summary\s*{[^}]*min-height:\s*var\(--touch-target\)/)
+    expect(css).toMatch(/\.skip-link\s*{[^}]*min-height:\s*var\(--touch-target\)/)
+    expect(css).toMatch(/\.skip-link:focus\s*{[^}]*top:/)
+  })
+
+  it('keeps line breaks in notes', async () => {
+    const css = await (await app.request('/styles.css')).text()
+
+    expect(css).toMatch(/\.notes\s*{[^}]*white-space:\s*pre-line/)
+  })
+
+  it('keeps table dates and times on one line', async () => {
+    const css = await (await app.request('/styles.css')).text()
+
+    expect(css).toMatch(/td time,\s*th time\s*{[^}]*white-space:\s*nowrap/)
   })
 
   it('makes the container fluid with a rem max-width', async () => {

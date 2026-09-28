@@ -59,6 +59,23 @@
   padding-inline: var(--pico-spacing);
 }
 
+/* Off-screen until focused, so keyboard users can jump past the nav. */
+.skip-link {
+  position: absolute;
+  z-index: 10;
+  inset-inline-start: var(--pico-spacing);
+  top: -10rem;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-target);
+  padding-inline: var(--pico-spacing);
+  background-color: var(--pico-background-color);
+}
+
+.skip-link:focus {
+  top: var(--pico-spacing);
+}
+
 svg,
 video {
   max-width: 100%;
@@ -69,8 +86,10 @@ h1 {
   font-size: clamp(1.75rem, 1.25rem + 2.5vw, 2.75rem);
 }
 
-/* Let brand and links wrap instead of overflowing at 320px. */
-header nav {
+/* Let brand and links wrap, and the links wrap among themselves, instead of
+   overflowing at 320px. */
+header nav,
+header nav ul {
   flex-wrap: wrap;
 }
 
@@ -96,14 +115,80 @@ nav li a[aria-current="page"] {
   color: var(--pico-primary);
 }
 
+/* Card grids: .feature-grid on the home page, .card-grid on catalog pages. */
+.card-grid,
 .feature-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--pico-spacing);
 }
 
-.feature-grid > article {
+:where(.card-grid, .feature-grid) > article {
   margin: 0;
+}
+
+/* Anchored cards (e.g. /ailments#ailment-2) scroll clear of the page edge. */
+.card-grid > article[id] {
+  scroll-margin-top: var(--pico-spacing);
+}
+
+/* Confirmation and error messages: a colored edge plus a bold lead-in or
+   heading, so they don't rely on color alone. */
+.notice,
+.error-summary {
+  border-inline-start: 0.35rem solid var(--pico-primary-background);
+}
+
+.error-summary {
+  border-inline-start-color: var(--pico-form-element-invalid-border-color);
+}
+
+.error-summary h2 {
+  font-size: 1.25rem;
+}
+
+/* Date and time side by side once there's room. */
+.grid-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  column-gap: var(--pico-spacing);
+}
+
+/* Dashboard count cards: a big number over its label. */
+.stat .stat-value {
+  margin-bottom: 0;
+  font-size: clamp(2rem, 1.5rem + 2vw, 2.75rem);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.stat p:last-child {
+  margin-bottom: 0;
+}
+
+/* A 44px tap target for <details> toggles. Flex keeps Pico's chevron on the
+   right, where its float would otherwise stop applying. */
+details summary {
+  display: flex;
+  align-items: center;
+  min-height: var(--touch-target);
+}
+
+details summary::after {
+  flex-shrink: 0;
+  margin-inline-start: auto;
+}
+
+/* Notes keep the line breaks the agent typed. */
+.notes {
+  white-space: pre-line;
+}
+
+/* Keep dates and times on one line; on phones the table scrolls sideways
+   inside its .overflow-auto wrapper instead. */
+td time,
+th time {
+  white-space: nowrap;
 }
 
 footer {
@@ -111,12 +196,17 @@ footer {
 }
 
 @media (min-width: 40rem) {
+  .grid-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .card-grid,
   .feature-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   /* An odd card out spans the full row instead of sitting alone. */
-  .feature-grid > :last-child:nth-child(odd) {
+  :where(.card-grid, .feature-grid) > :last-child:nth-child(odd) {
     grid-column: 1 / -1;
   }
 }
@@ -126,11 +216,12 @@ footer {
     font-size: 1.5rem;
   }
 
+  .card-grid,
   .feature-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .feature-grid > :last-child:nth-child(odd) {
+  :where(.card-grid, .feature-grid) > :last-child:nth-child(odd) {
     grid-column: auto;
   }
 }
