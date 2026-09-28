@@ -80,13 +80,13 @@ See `requirements.md` for scope and decisions, and `validation.md` for merge cri
 
 ## 5. Phase 5: Dashboard
 
-5.1 Create `src/dashboard/queries.ts`: `counts(db, today)` and `todaysAppointments(db, today)`, plus `upcomingForAgent(db, agentId, today)` reused from appointments.
+5.1 Create `src/dashboard/queries.ts` with `counts(db, today)` ("upcoming" includes today, matching `/appointments`). Add `listForDay(db, today)` and `upcomingForAgent(db, agentId, today)` to `src/appointments/queries.ts`, and export `AppointmentsTable` so the dashboards reuse it. Each row's date links to its appointment page, where it can be cancelled.
 5.2 `GET /dashboard` (staff):
   - A `.feature-grid` of count cards (agents, ailments, therapies, today's appointments, upcoming appointments).
   - Today's appointments in slot order, with an empty state.
   - Agent links to `/agents/:id/dashboard`.
 5.3 `GET /agents/:id/dashboard` (agent): "My ailments", "Recommended therapies", and "Upcoming appointments", each with its own empty state, plus a "Book an appointment" link. Link to it from agent detail.
-5.4 Add Dashboard to `navItems`, and make `/agents/:id/dashboard` mark Agents as current.
+5.4 Add Dashboard to `navItems`, and make `/agents/:id/dashboard` mark Agents as current. Both dashboard routes live in `src/dashboard/routes.tsx`, mounted at the root.
 5.5 Tests: `src/dashboard/dashboard.test.ts`, using a fixed `now` so "today" is deterministic.
 
 ## 6. Phase 6: Polish

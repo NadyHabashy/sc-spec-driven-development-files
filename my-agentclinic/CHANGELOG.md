@@ -4,6 +4,8 @@ All notable changes to AgentClinic, grouped by date (newest first).
 
 ## 2026-09-28
 
+- Implemented Phase 5 (Dashboard): a staff dashboard at `/dashboard` with counts, today's appointments, and links to each agent's dashboard; and an agent dashboard at `/agents/:id/dashboard` with the agent's ailments, recommended therapies, and upcoming appointments, each with an empty state. Dashboard is now in the nav, and agent pages link to their dashboard.
+- Appointment rows now link to the appointment's page, so any booking can be opened and cancelled from the lists and dashboards.
 - Implemented Phase 4 (Appointments, booking): a booking form at `/appointments/new` validated with Zod, with an error summary and per-field messages; bookings redirect to a confirmation page, a slot can't be double-booked (checked in the route and guarded by the unique index), and upcoming appointments can be cancelled, freeing the slot.
 - Added htmx (served locally, loaded only on the booking page) to show which slots are taken or already past when a date is picked; without JavaScript the form still works and the server rejects taken slots.
 - Added "Book an appointment" buttons to agent pages and the appointments list, and recorded htmx in `specs/tech-stack.md`.

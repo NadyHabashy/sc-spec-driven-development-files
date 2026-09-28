@@ -10,7 +10,8 @@ type AppointmentsTableProps = {
   statusFor?: (appointment: AppointmentRow) => string
 }
 
-const AppointmentsTable = ({ caption, appointments, statusFor }: AppointmentsTableProps) => (
+// Each row's date links to the appointment, where it can be cancelled.
+export const AppointmentsTable = ({ caption, appointments, statusFor }: AppointmentsTableProps) => (
   <div class="overflow-auto">
     <table>
       <caption>{caption}</caption>
@@ -27,7 +28,9 @@ const AppointmentsTable = ({ caption, appointments, statusFor }: AppointmentsTab
         {appointments.map((appointment) => (
           <tr>
             <th scope="row">
-              <time datetime={appointment.date}>{formatDate(appointment.date)}</time>
+              <a href={`/appointments/${appointment.id}`}>
+                <time datetime={appointment.date}>{formatDate(appointment.date)}</time>
+              </a>
             </th>
             <td>
               <time datetime={`${appointment.date}T${appointment.slot}`}>{appointment.slot}</time>

@@ -6,6 +6,7 @@ import { agentsRoutes } from './agents/routes.js'
 import { ailmentsRoutes } from './ailments/routes.js'
 import { appointmentsRoutes } from './appointments/routes.js'
 import type { Db } from './db/connection.js'
+import { dashboardRoutes } from './dashboard/routes.js'
 import type { AppEnv } from './env.js'
 import { HomePage } from './home.js'
 import { renderPage } from './render.js'
@@ -42,6 +43,7 @@ export const createApp = ({ db, now = () => new Date() }: AppOptions) => {
   app.route('/ailments', ailmentsRoutes)
   app.route('/therapies', therapiesRoutes)
   app.route('/appointments', appointmentsRoutes)
+  app.route('/', dashboardRoutes)
 
   return app
 }

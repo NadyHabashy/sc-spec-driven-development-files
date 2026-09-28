@@ -47,6 +47,9 @@ export const AgentDetailPage = ({ agent, ailments, therapies }: AgentDetailPageP
     <p>
       <a href={`/appointments/new?agentId=${agent.id}`} role="button">
         Book an appointment
+      </a>{' '}
+      <a href={`/agents/${agent.id}/dashboard`} role="button" class="secondary outline">
+        View dashboard
       </a>
     </p>
 

@@ -66,7 +66,7 @@ describe('GET /appointments', () => {
 
     expect(body).toMatch(/<div class="overflow-auto"><table><caption>Upcoming appointments/)
     expect(body).toContain('<th scope="col">Date</th>')
-    expect(body).toMatch(/<th scope="row"><time datetime="2026-10-01">/)
+    expect(body).toMatch(/<th scope="row"><a href="\/appointments\/1"><time datetime="2026-10-01">/)
     expect(body).toMatch(/<a [^>]*aria-current="page"[^>]*>Appointments<\/a>/)
   })
 

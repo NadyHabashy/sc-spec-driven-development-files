@@ -69,8 +69,9 @@ Finish the roadmap (`specs/roadmap.md` Phases 2–6) on the `mvp` branch and del
 | `GET /agents/:id/dashboard` | Agent dashboard |
 
 - **Nav grows one link per shipped page**, as Phase 1 decided: Home, Agents, Ailments, Therapies, Appointments, and Dashboard. `aria-current` matches the section prefix, so `/agents/3` marks Agents as current. At `320px` the nav wraps rather than scrolling horizontally.
-- **Staff dashboard** (`/dashboard`, no auth): count cards (agents, ailments, therapies, today's appointments, upcoming appointments), then today's appointments in slot order, then a list of agents linking to their agent dashboards.
+- **Staff dashboard** (`/dashboard`, no auth): count cards (agents, ailments, therapies, today's appointments, and upcoming appointments including today's, matching `/appointments`), then today's appointments in slot order, then a list of agents linking to their agent dashboards.
 - **Agent dashboard** (`/agents/:id/dashboard`, no auth, reached from the staff dashboard and the agent detail page): "My ailments", "Recommended therapies", and "Upcoming appointments" (booked, today or later), each with an empty state.
+- **Appointment rows link to the appointment.** In every appointments table, the date links to `/appointments/:id`, so staff can open any booking and cancel it.
 - **Tables are responsive.** Every table is wrapped in Pico's `.overflow-auto` so a wide table scrolls inside its container, not the page. It has a `<caption>` and `<th scope>`. Dates and times use `<time datetime>` and don't wrap, so rows stay one line tall on phones.
 - **The nav wraps on phones.** Both the nav and its link list wrap (`flex-wrap: wrap`), so at `320px` the links take extra rows rather than scrolling the page sideways.
 

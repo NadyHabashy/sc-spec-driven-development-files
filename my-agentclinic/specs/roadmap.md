@@ -33,8 +33,8 @@ The app is built in very small phases. Each phase is shippable on its own: the a
 - [x] Cancel an appointment
 
 ## Phase 5: Dashboard
-- [ ] Staff dashboard: today's appointments and counts
-- [ ] Agent view: my ailments, therapies, and upcoming appointments
+- [x] Staff dashboard: today's appointments and counts
+- [x] Agent view: my ailments, therapies, and upcoming appointments
 
 ## Phase 6: Polish
 - [ ] Empty states, error pages, and a 404 page

@@ -137,6 +137,18 @@ nav li a[aria-current="page"] {
   column-gap: var(--pico-spacing);
 }
 
+/* Dashboard count cards: a big number over its label. */
+.stat .stat-value {
+  margin-bottom: 0;
+  font-size: clamp(2rem, 1.5rem + 2vw, 2.75rem);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.stat p:last-child {
+  margin-bottom: 0;
+}
+
 /* Keep dates and times on one line; on phones the table scrolls sideways
    inside its .overflow-auto wrapper instead. */
 td time,

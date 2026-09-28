@@ -42,6 +42,7 @@ Tests use an in-memory SQLite database (`':memory:'`), migrated and seeded per t
 ### Appointments list (`src/appointments/appointments-list.test.ts`)
 - [ ] `GET /appointments` returns 200 and shows upcoming booked appointments in date-then-slot order.
 - [ ] Past and cancelled appointments are inside a `<details>` element, not the main table.
+- [ ] Each row's date links to `/appointments/{id}`.
 - [ ] The table has a `<caption>`, `th scope` headers, and sits inside `.overflow-auto`.
 - [ ] With no appointments, the page shows the empty state and a link to book.
 
@@ -69,7 +70,7 @@ Tests use an in-memory SQLite database (`':memory:'`), migrated and seeded per t
 - [ ] `GET /appointments/:id` shows the Cancel button only for booked, upcoming appointments.
 
 ### Dashboard (`src/dashboard/dashboard.test.ts`)
-- [ ] `GET /dashboard` shows these counts for the seed: 6 agents, 8 ailments, 6 therapies, 3 today, and the correct number upcoming.
+- [ ] `GET /dashboard` shows these counts for the seed: 6 agents, 8 ailments, 6 therapies, 3 today, and 8 upcoming (including today's; past and cancelled don't count).
 - [ ] It lists today's 3 appointments in slot order and links every agent to `/agents/{id}/dashboard`.
 - [ ] With no appointments today, it shows the "no appointments today" empty state.
 - [ ] `GET /agents/:id/dashboard` shows that agent's ailments, recommended therapies, and upcoming booked appointments only, excluding past and cancelled ones and other agents' appointments.

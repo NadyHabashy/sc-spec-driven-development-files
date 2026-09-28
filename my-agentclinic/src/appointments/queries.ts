@@ -97,3 +97,23 @@ export const cancelAppointment = (db: Db, id: number): boolean =>
       "UPDATE appointments SET status = 'cancelled' WHERE id = ? AND status = 'booked'",
     )
     .run(id).changes === 1
+
+// Booked appointments on `today` (YYYY-MM-DD), in slot order.
+export const listForDay = (db: Db, today: string): AppointmentRow[] =>
+  db
+    .prepare<[string], AppointmentRow>(
+      `${select}
+       WHERE appointments.status = 'booked' AND appointments.date = ?
+       ORDER BY appointments.slot`,
+    )
+    .all(today)
+
+// One agent's booked appointments from `today` on, soonest first.
+export const upcomingForAgent = (db: Db, agentId: number, today: string): AppointmentRow[] =>
+  db
+    .prepare<[number, string], AppointmentRow>(
+      `${select}
+       WHERE appointments.agent_id = ? AND appointments.status = 'booked' AND appointments.date >= ?
+       ORDER BY appointments.date, appointments.slot`,
+    )
+    .all(agentId, today)
