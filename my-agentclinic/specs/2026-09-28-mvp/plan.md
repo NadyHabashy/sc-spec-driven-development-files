@@ -66,7 +66,7 @@ See `requirements.md` for scope and decisions, and `validation.md` for merge cri
   - Parse the form with `bookingSchema`, and check that the agent and therapy exist and the slot is free.
   - Insert and redirect with 303 to `/appointments/:id?booked=1`.
   - On a validation error, re-render with 400. On a taken slot, re-render with 409, and also catch `SQLITE_CONSTRAINT_UNIQUE` from the insert and map it to 409.
-4.5 `GET /appointments/:id` shows the appointment details, a confirmation banner (`role="status"`) when `booked=1` or `cancelled=1`, and a Cancel form (a POST button) while it's booked and its slot hasn't started.
+4.5 `GET /appointments/:id` shows the appointment details (notes in a `.notes` element that keeps line breaks), a confirmation banner (`role="status"`) when `booked=1` or `cancelled=1`, and a Cancel form (a POST button) while it's booked and its slot hasn't started.
 4.6 `POST /appointments/:id/cancel`: validate the id, reject cancelled appointments and ones whose slot has started with a message (409), otherwise set `status = 'cancelled'` (only if still booked, so a concurrent cancel also gets the 409) and redirect with 303 to `/appointments/:id?cancelled=1`.
 4.7 Add the "Book an appointment" link to agent detail and a "Book" button to `/appointments`.
 

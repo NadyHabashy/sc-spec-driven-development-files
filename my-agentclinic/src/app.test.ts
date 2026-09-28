@@ -120,6 +120,12 @@ describe('GET /styles.css', () => {
     expect(css).toMatch(/\.skip-link:focus\s*{[^}]*top:/)
   })
 
+  it('keeps line breaks in notes', async () => {
+    const css = await (await app.request('/styles.css')).text()
+
+    expect(css).toMatch(/\.notes\s*{[^}]*white-space:\s*pre-line/)
+  })
+
   it('keeps table dates and times on one line', async () => {
     const css = await (await app.request('/styles.css')).text()
 

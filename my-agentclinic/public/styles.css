@@ -179,6 +179,11 @@ details summary::after {
   margin-inline-start: auto;
 }
 
+/* Notes keep the line breaks the agent typed. */
+.notes {
+  white-space: pre-line;
+}
+
 /* Keep dates and times on one line; on phones the table scrolls sideways
    inside its .overflow-auto wrapper instead. */
 td time,

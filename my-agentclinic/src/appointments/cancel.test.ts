@@ -72,7 +72,7 @@ describe('GET /appointments/:id', () => {
     expect(body).toContain('<h1>Appointment for Rex Regex</h1>')
     expect(body).toContain('<a href="/therapies#therapy-5">Refactoring Retreat</a>')
     expect(body).toContain('<time datetime="2026-10-02">Fri, Oct 2, 2026</time>')
-    expect(body).toContain('<dd>Please, no COBOL in the waiting room.</dd>')
+    expect(body).toContain('<dd class="notes">Please, no COBOL in the waiting room.</dd>')
     expect(body).toContain('<form method="post" action="/appointments/5/cancel">')
     expect(body).not.toContain('role="status"')
   })

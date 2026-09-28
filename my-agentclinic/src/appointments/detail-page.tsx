@@ -63,7 +63,7 @@ export const AppointmentPage = ({
       {appointment.notes && (
         <>
           <dt>Notes</dt>
-          <dd>{appointment.notes}</dd>
+          <dd class="notes">{appointment.notes}</dd>
         </>
       )}
     </dl>

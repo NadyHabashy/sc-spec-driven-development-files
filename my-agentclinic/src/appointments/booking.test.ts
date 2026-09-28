@@ -206,4 +206,12 @@ describe('notes with line breaks', () => {
       .get(id)
     expect(row?.notes).toBe(notes)
   })
+
+  it('shows multi-line notes with their line breaks on the appointment page', async () => {
+    const { app } = setup()
+    const res = await post(app, { ...free, notes: 'Bring papers\r\nNo COBOL' })
+
+    const body = await (await app.request(res.headers.get('Location') ?? '')).text()
+    expect(body).toContain('<dd class="notes">Bring papers\nNo COBOL</dd>')
+  })
 })
