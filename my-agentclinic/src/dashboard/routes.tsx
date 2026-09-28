@@ -13,13 +13,14 @@ export const dashboardRoutes = new Hono<AppEnv>()
 
 dashboardRoutes.get('/dashboard', (c) => {
   const { db } = c.var
-  const today = toIsoDate(c.var.now())
+  const now = c.var.now()
 
   return c.html(
     renderPage(
       <StaffDashboardPage
-        counts={counts(db, today)}
-        today={listForDay(db, today)}
+        now={now}
+        counts={counts(db, now)}
+        today={listForDay(db, toIsoDate(now))}
         agents={agentRefs(db)}
       />,
     ),
@@ -38,7 +39,7 @@ dashboardRoutes.get('/agents/:id/dashboard', (c) => {
         agent={agent}
         ailments={ailmentsForAgent(db, agent.id)}
         therapies={recommendedTherapiesForAgent(db, agent.id)}
-        upcoming={upcomingForAgent(db, agent.id, toIsoDate(c.var.now()))}
+        upcoming={upcomingForAgent(db, agent.id, c.var.now())}
       />,
     ),
   )

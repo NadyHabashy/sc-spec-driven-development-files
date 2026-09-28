@@ -8,6 +8,7 @@ import { appointmentsRoutes } from './appointments/routes.js'
 import type { Db } from './db/connection.js'
 import { dashboardRoutes } from './dashboard/routes.js'
 import type { AppEnv } from './env.js'
+import { ErrorPage, NotFoundPage } from './errors/pages.js'
 import { HomePage } from './home.js'
 import { renderPage } from './render.js'
 import { therapiesRoutes } from './therapies/routes.js'
@@ -44,6 +45,14 @@ export const createApp = ({ db, now = () => new Date() }: AppOptions) => {
   app.route('/therapies', therapiesRoutes)
   app.route('/appointments', appointmentsRoutes)
   app.route('/', dashboardRoutes)
+
+  // Used for unknown paths and for c.notFound() in routes (invalid ids).
+  app.notFound((c) => c.html(renderPage(<NotFoundPage currentPath={c.req.path} />), 404))
+
+  app.onError((error, c) => {
+    console.error(error)
+    return c.html(renderPage(<ErrorPage currentPath={c.req.path} />), 500)
+  })
 
   return app
 }

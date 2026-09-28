@@ -56,7 +56,7 @@ const renderAppointment = (
   return renderPage(
     <AppointmentPage
       appointment={appointment}
-      status={statusLabel(appointment, toIsoDate(now))}
+      status={statusLabel(appointment, now)}
       canCancel={
         appointment.status === 'booked' && !hasStarted(appointment.date, appointment.slot, now)
       }
@@ -72,14 +72,14 @@ const findAppointment = (c: Ctx) => {
 }
 
 appointmentsRoutes.get('/', (c) => {
-  const today = toIsoDate(c.var.now())
+  const now = c.var.now()
 
   return c.html(
     renderPage(
       <AppointmentsPage
-        today={today}
-        upcoming={listUpcoming(c.var.db, today)}
-        pastOrCancelled={listPastOrCancelled(c.var.db, today)}
+        now={now}
+        upcoming={listUpcoming(c.var.db, now)}
+        pastOrCancelled={listPastOrCancelled(c.var.db, now)}
       />,
     ),
   )

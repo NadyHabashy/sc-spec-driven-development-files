@@ -18,7 +18,7 @@ describe('layout subcomponents', () => {
         <p>content</p>
       </Main>,
     )
-    expect(html).toMatch(/^<main class="container">/)
+    expect(html).toMatch(/^<main class="container" id="main">/)
     expect(html).toContain('<p>content</p>')
   })
 
@@ -80,6 +80,14 @@ describe('Layout', () => {
     )
     const head = html.split('</head>')[0]
     expect(head).toContain('<script src="/htmx.min.js" defer=""></script>')
+  })
+
+  it('starts with a skip link to the main content', () => {
+    const html = render()
+    const body = html.slice(html.indexOf('<body>') + '<body>'.length)
+
+    expect(body).toMatch(/^<a class="skip-link" href="#main">Skip to content<\/a><header/)
+    expect(html).toContain('<main class="container" id="main">')
   })
 
   it('renders header, main, and footer in order', () => {

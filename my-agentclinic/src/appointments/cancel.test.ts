@@ -80,7 +80,7 @@ describe('GET /appointments/:id', () => {
   it.each([
     [10, 'Cancelled'],
     [9, 'Completed'],
-    [1, 'Booked'],
+    [1, 'Completed'],
   ])('hides the Cancel button for appointment %i (%s)', async (id, label) => {
     const body = await (await testApp().request(`/appointments/${id}`)).text()
 

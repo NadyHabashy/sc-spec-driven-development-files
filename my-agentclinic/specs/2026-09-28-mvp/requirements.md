@@ -26,15 +26,17 @@ Finish the roadmap (`specs/roadmap.md` Phases 2–6) on the `mvp` branch and del
 ### Data
 
 - **SQLite file with an env-configurable path.** `DATABASE_PATH` sets the file, defaulting to the project's `data/agentclinic.db`. The default is resolved from the module location (like Pico and `migrations/`), not the working directory, so the server, `db:migrate`, and `db:seed` share one file however they're started. A relative `DATABASE_PATH` is relative to the working directory, as usual for command-line paths. `data/` is gitignored (and ignored by ESLint and Prettier) and created if it doesn't exist. The connection enables `foreign_keys = ON` and `journal_mode = WAL`.
-- **Injected database.** `src/app.tsx` exports `createApp({ db, now })` instead of a module-level `app`, so tests pass an in-memory database (`':memory:'`) and a fixed clock. `src/index.ts` opens the file database, runs migrations, and starts the server. `now: () => Date` defaults to the real clock and is the only source of "today".
+- **Injected database.** `src/app.tsx` exports `createApp({ db, now })` instead of a module-level `app`, so tests pass an in-memory database (`':memory:'`) and a fixed clock. `src/index.ts` opens the file database, runs migrations, and starts the server. `now: () => Date` defaults to the real clock and is the only source of "today" and "now".
+- **The server's local time is the clinic's time.** Dates, slots, "today", and whether a slot has started are all judged in the server's local time zone. Visitors in other time zones see clinic time. Deploy the server with its time zone set to the clinic's (e.g. `TZ=Europe/Berlin`); a UTC server shifts "today" for everyone else.
 - **Numbered SQL migrations.** Migrations are plain `.sql` files in `migrations/` at the project root (`001_catalog.sql`, `002_appointments.sql`, …). They're resolved from the module location with `import.meta.url` (like Pico), so both `tsx` and `dist/` find them. A `schema_migrations` table records applied versions. Each migration runs in its own transaction, in filename order, and a migration that has already run is never re-applied. `npm run db:migrate` runs them, and the server also runs them on startup.
 - **Many-to-many relationships.** The schema has the tables `agents`, `ailments`, `therapies`, `agent_ailments(agent_id, ailment_id)`, and `ailment_therapies(ailment_id, therapy_id)`, with composite primary keys and `ON DELETE CASCADE` foreign keys. An agent has many ailments, and a therapy treats many ailments. An agent's **recommended therapies** are the distinct therapies that treat any of their ailments.
 - **Columns** (all `NOT NULL` unless noted):
   - `agents`: `id`, `name` (unique), `model` (e.g. "GPT-ish 4"), `bio`.
   - `ailments`: `id`, `name` (unique), `description`, `severity` (`'mild' | 'moderate' | 'severe'`, enforced by a `CHECK`).
-  - `therapies`: `id`, `name` (unique), `description`, `duration_minutes` (always 60 in the MVP, since one slot is one hour).
-  - `appointments`: `id`, `agent_id` (FK), `therapy_id` (FK), `date` (`TEXT`, `YYYY-MM-DD`, enforced by a `CHECK` that uses `IS` so an unparseable date can't slip through as `NULL`), `slot` (`TEXT`, `HH:MM`, one of the eight slots by `CHECK`), `status` (`'booked' | 'cancelled'`, default `'booked'`), `notes` (nullable), `created_at`.
-- **Small, fixed, deterministic seed.** 6 agents, 8 ailments, 6 therapies, and 10 appointments. It includes one agent with no ailments and no appointments, and one ailment that no therapy treats yet ("no known cure"), so empty states have real data to show. Appointment dates are relative to `now()` (3 today, 5 in the future, 1 in the past, and 1 cancelled), so the dashboard always has something to show. `seed(db, now)` clears the tables and inserts everything in one transaction, so it's idempotent. `npm run db:seed` runs it against `DATABASE_PATH`. Names and copy are playful (e.g. "Context-Window Fatigue", "Hallucination Anxiety", "Prompt-Injection Trauma").
+  - `therapies`: `id`, `name` (unique), `description`, `duration_minutes` (always 60: every therapy takes exactly one hourly slot, and booking never reads this column. It's shown on the therapies page and kept for a future with longer therapies).
+  - `appointments`: `id`, `agent_id` (FK), `therapy_id` (FK), `date` (`TEXT`, `YYYY-MM-DD`, enforced by a `CHECK` that uses `IS` so an unparseable date can't slip through as `NULL`), `slot` (`TEXT`, `HH:MM`, one of the eight slots by `CHECK`), `status` (`'booked' | 'cancelled'`, default `'booked'`), `notes` (nullable), `created_at` (set by the database for auditing; not shown in the UI).
+- **Small, fixed, deterministic seed.** 6 agents, 8 ailments, 6 therapies, and 10 appointments. It includes one agent with no ailments and no appointments, and one ailment that no therapy treats yet ("no known cure"), so empty states have real data to show. Appointment dates are relative to `now()` (3 today, 5 in the future, 1 in the past, and 1 cancelled), so the dashboard always has something to show. `seed(db, now)` clears the tables and inserts everything in one transaction, so it's idempotent. `npm run db:seed` runs it against `DATABASE_PATH`.
+- **Seeding is a reset, and it's always explicit.** `npm run db:seed` replaces all data, including real bookings made since the last seed, which is what a booth demo wants between visitors. The server never seeds on its own: startup only migrates. A fresh install shows empty states until someone runs `npm run db:seed`, and the README's setup steps say to run it. Names and copy are playful (e.g. "Context-Window Fatigue", "Hallucination Anxiety", "Prompt-Injection Trauma").
 
 ### Booking
 
@@ -43,10 +45,11 @@ Finish the roadmap (`specs/roadmap.md` Phases 2–6) on the `mvp` branch and del
   - The route checks first and re-renders the form with a friendly error (409).
   - A partial unique index, `UNIQUE (date, slot) WHERE status = 'booked'`, is the final guard. A constraint violation becomes the same 409 message, never a 500.
   - Cancelled appointments free their slot.
+- **One rule for "upcoming": an appointment is upcoming until its slot starts.** From its start time it's "In progress" for its hour, then "Completed". The same rule decides the Upcoming table, the dashboard's Upcoming count, an agent's upcoming appointments, whether a booking can be cancelled, and which slots can be booked. "Today's appointments" on the staff dashboard still lists every booking today, with its status.
 - **Past dates are rejected.** The date must be today or later, and today's slots that have already started are rejected, both judged by `now()`.
 - **Zod everywhere input enters.** A `bookingSchema` validates the form (`agentId` and `therapyId` as positive integers that must exist, `date` as an ISO date not in the past, `slot` as one of the eight slots, and `notes` optional, trimmed, and at most 500 characters). Route params such as `:id` go through a shared `idParam` schema: plain digits with no leading zero, and no larger than `Number.MAX_SAFE_INTEGER`, so a huge id can't round to a neighboring row. An invalid or unknown id returns the 404 page. Form types come from `z.infer`.
 - **Post/Redirect/Get.** `POST /appointments` redirects with 303 to `/appointments/:id?booked=1`, which shows a confirmation. On a validation error, it re-renders the form with status 400 (409 for a taken slot), keeps what the user entered, and shows an error summary with per-field messages.
-- **Cancellation.** `POST /appointments/:id/cancel` sets `status = 'cancelled'` and redirects with 303 back to the appointment. Cancelling a cancelled appointment, or one whose slot has already started, is rejected with a message. There's no auth, so anyone can cancel. That's acceptable for a demo app.
+- **Cancellation.** `POST /appointments/:id/cancel` sets `status = 'cancelled'` and redirects with 303 back to the appointment. Cancelling a cancelled appointment, or one whose slot has already started, is rejected with a message. There's no auth, so anyone can cancel any booking, and appointment ids are sequential, so every booking is easy to reach. That's a deliberate choice for the demo, in line with the mission's "no authentication beyond what the dashboard needs"; staff-only cancelling would need auth and is out of scope.
 - **htmx for free slots, as progressive enhancement.** The booking form works with no JavaScript: it lists all eight slots, and the server rejects taken ones. When htmx loads, changing the date triggers `hx-get="/appointments/slots?date=…"`, which returns the `<option>` list with taken slots (and slots that have already started) disabled. It also runs on page load, for the default date. htmx is installed from npm (`htmx.org`), served locally at `/htmx.min.js` (no CDN, so booth demos work offline), and loaded only on the booking page. `specs/tech-stack.md` is updated to say htmx is now in use.
 
 ### Pages and routes
@@ -59,7 +62,7 @@ Finish the roadmap (`specs/roadmap.md` Phases 2–6) on the `mvp` branch and del
 | `GET /agents/:id` | Agent detail: bio, ailments (linked), recommended therapies, and a "Book an appointment" link prefilled with the agent |
 | `GET /ailments` | Ailments catalog: each ailment with its severity, the agents who have it (linked to their detail pages), and the therapies that treat it (or "no known cure"). Each ailment has an `id="ailment-{id}"` anchor |
 | `GET /therapies` | Therapies: each therapy with its duration and the ailments it treats (linked to their anchors). Each therapy has an `id="therapy-{id}"` anchor, which agent detail and the ailments catalog link to |
-| `GET /appointments` | List of upcoming `booked` appointments, soonest first (date, slot, agent, therapy), with a "Book" button (from Phase 4). Past and cancelled appointments are in a collapsed `<details>`, with a Status column showing "Completed" or "Cancelled" as text |
+| `GET /appointments` | List of upcoming `booked` appointments (slot not yet started), soonest first (date, slot, agent, therapy), with a "Book an appointment" button (from Phase 4). Started and cancelled appointments are in a collapsed `<details>`, with a Status column showing "In progress", "Completed", or "Cancelled" as text |
 | `GET /appointments/new` | Booking form (`?agentId=` preselects an agent) |
 | `GET /appointments/slots` | htmx fragment of `<option>`s for `?date=` |
 | `POST /appointments` | Create and redirect, or re-render with errors |
@@ -69,21 +72,21 @@ Finish the roadmap (`specs/roadmap.md` Phases 2–6) on the `mvp` branch and del
 | `GET /agents/:id/dashboard` | Agent dashboard |
 
 - **Nav grows one link per shipped page**, as Phase 1 decided: Home, Agents, Ailments, Therapies, Appointments, and Dashboard. `aria-current` matches the section prefix, so `/agents/3` marks Agents as current. At `320px` the nav wraps rather than scrolling horizontally.
-- **Staff dashboard** (`/dashboard`, no auth): count cards (agents, ailments, therapies, today's appointments, and upcoming appointments including today's, matching `/appointments`), then today's appointments in slot order, then a list of agents linking to their agent dashboards.
-- **Agent dashboard** (`/agents/:id/dashboard`, no auth, reached from the staff dashboard and the agent detail page): "My ailments", "Recommended therapies", and "Upcoming appointments" (booked, today or later), each with an empty state.
+- **Staff dashboard** (`/dashboard`, no auth): count cards (agents, ailments, therapies, all of today's appointments, and upcoming appointments, matching `/appointments`), then today's appointments in slot order with their status, then a list of agents linking to their agent dashboards.
+- **Agent dashboard** (`/agents/:id/dashboard`, no auth, reached from the staff dashboard and the agent detail page): "My ailments", "Recommended therapies", and "Upcoming appointments" (booked, slot not yet started), each with an empty state.
 - **Appointment rows link to the appointment.** In every appointments table, the date links to `/appointments/:id`, so staff can open any booking and cancel it.
 - **Tables are responsive.** Every table is wrapped in Pico's `.overflow-auto` so a wide table scrolls inside its container, not the page. It has a `<caption>` and `<th scope>`. Dates and times use `<time datetime>` and don't wrap, so rows stay one line tall on phones.
 - **The nav wraps on phones.** Both the nav and its link list wrap (`flex-wrap: wrap`), so at `320px` the links take extra rows rather than scrolling the page sideways.
 
 ### Polish
 
-- **Empty states** for every list: no appointments, an agent with no ailments, an ailment no therapy treats, no appointments today. Each uses playful copy and a next action where one exists.
+- **Empty states** for every list: no appointments, an agent with no ailments, an ailment no therapy treats, no appointments today. Each uses playful copy and a next action where one exists (book an appointment, or browse the ailments or therapies).
 - **Error pages.** `app.notFound` renders a 404 page inside the layout (playful copy and a link home). `app.onError` logs the error and renders a generic 500 page without a stack trace.
 - **Accessibility pass:**
-  - A "Skip to content" link.
+  - A "Skip to content" link, first in `<body>`, off-screen until focused, targeting `<main id="main">`.
   - One `<h1>` per page and a logical heading order.
   - Every form control has a `<label>`. Errors use `aria-invalid` and `aria-describedby`, and an error summary with `role="alert"` links to each field.
-  - Visible focus on everything interactive.
+  - Visible focus on everything interactive, and a 44px minimum touch target for buttons, form controls, nav links, and `<details>` toggles.
   - Status isn't shown by color alone: severity and appointment status appear as text.
   - WCAG AA contrast in light and dark themes.
 - **Browsers**: the latest Chrome, Firefox, Safari, and Edge (tech stack).
@@ -101,3 +104,5 @@ Finish the roadmap (`specs/roadmap.md` Phases 2–6) on the `mvp` branch and del
 - Tech stack: `specs/tech-stack.md`. Hono JSX, `better-sqlite3`, Zod, Vitest, Pico CSS, mobile-first CSS with `40rem`/`64rem` breakpoints, `npm run validate` as the merge gate.
 - Previous phases: `specs/2026-09-24-phase-0-skeleton/` and `specs/2026-09-26-phase-1-layout-and-look/`. Their patterns carry forward: named prop types, `readonly` data arrays, assets resolved from module location, and every automated check backed by a Vitest test.
 - Work happens on the `mvp` branch, with one commit (or more) per phase, and it merges to `main` only when `validation.md` passes.
+- **When checks run.** `specs/tech-stack.md` asks each phase to check its pages at three widths. On this branch, each phase runs an automated check in headless Chrome (every page at `320px`, `768px`, and `1280px` in light and dark themes); the manual checks in `validation.md` run once, at wrap-up, for the whole MVP. A phase's automated checks only cover pages that exist by then: a check that depends on a later page (like the appointments empty state's booking link) is met in that later phase.
+- **Browser coverage.** Chrome is checked automatically. Firefox, Safari, and Edge are checked by hand at wrap-up by whoever merges the branch, because they couldn't be automated from the development session (see plan step 6.5).

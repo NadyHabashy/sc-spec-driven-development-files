@@ -40,11 +40,11 @@ Tests use an in-memory SQLite database (`':memory:'`), migrated and seeded per t
 - [ ] `GET /therapies` lists all 6 therapies with the ailments each treats. The untreated ailment is absent from every therapy.
 
 ### Appointments list (`src/appointments/appointments-list.test.ts`)
-- [ ] `GET /appointments` returns 200 and shows upcoming booked appointments in date-then-slot order.
+- [ ] `GET /appointments` returns 200 and shows booked appointments whose slot hasn't started, in date-then-slot order. At 10:30, today's 09:00 appointment is in the past-and-cancelled section as "Completed".
 - [ ] Past and cancelled appointments are inside a `<details>` element, not the main table.
 - [ ] Each row's date links to `/appointments/{id}`.
 - [ ] The table has a `<caption>`, `th scope` headers, and sits inside `.overflow-auto`.
-- [ ] With no appointments, the page shows the empty state and a link to book.
+- [ ] With no appointments, the page shows the empty state and a link to book (met in Phase 4, when the booking page exists).
 
 ### Booking (`src/appointments/schema.test.ts`, `src/appointments/booking.test.ts`, `src/appointments/slots.test.ts`)
 - [ ] `bookingSchema` accepts a valid booking and rejects:
@@ -67,13 +67,14 @@ Tests use an in-memory SQLite database (`':memory:'`), migrated and seeded per t
 - [ ] `POST /appointments/:id/cancel` on an upcoming booked appointment returns 303 and sets its status to `cancelled`.
 - [ ] After cancelling, the same slot can be booked again.
 - [ ] Cancelling a cancelled appointment, or one whose slot has started, returns 409 and changes nothing.
-- [ ] `GET /appointments/:id` shows the Cancel button only for booked, upcoming appointments.
+- [ ] `GET /appointments/:id` shows the Cancel button only for booked appointments whose slot hasn't started.
+- [ ] Status labels follow one rule: "Booked" until the slot starts, "In progress" for its hour, then "Completed"; "Cancelled" always wins (`src/appointments/status.test.ts`).
 
 ### Dashboard (`src/dashboard/dashboard.test.ts`)
-- [ ] `GET /dashboard` shows these counts for the seed: 6 agents, 8 ailments, 6 therapies, 3 today, and 8 upcoming (including today's; past and cancelled don't count).
+- [ ] `GET /dashboard` shows these counts for the seed at 10:30: 6 agents, 8 ailments, 6 therapies, 3 today (all of today's bookings), and 7 upcoming (slot not yet started; cancelled ones don't count). Today's table shows each appointment's status.
 - [ ] It lists today's 3 appointments in slot order and links every agent to `/agents/{id}/dashboard`.
 - [ ] With no appointments today, it shows the "no appointments today" empty state.
-- [ ] `GET /agents/:id/dashboard` shows that agent's ailments, recommended therapies, and upcoming booked appointments only, excluding past and cancelled ones and other agents' appointments.
+- [ ] `GET /agents/:id/dashboard` shows that agent's ailments, recommended therapies, and upcoming booked appointments only, excluding started and cancelled ones and other agents' appointments.
 - [ ] The agent with nothing booked shows each empty state and a "Book an appointment" link.
 - [ ] `GET /agents/999/dashboard` returns 404.
 
@@ -81,7 +82,9 @@ Tests use an in-memory SQLite database (`':memory:'`), migrated and seeded per t
 - [ ] An unknown path returns 404 with the not-found page inside the layout, with an `<h1>` and a link to `/`.
 - [ ] A route that throws returns 500 with the error page, and the body contains no stack trace or error message.
 - [ ] `Layout` renders a "Skip to content" link as the first focusable element, targeting `#main`, and `<main id="main">`.
-- [ ] Every page route renders exactly one `<h1>` (tested across a list of routes).
+- [ ] Every page route renders exactly one `<h1>`, first, with no skipped heading levels, and starts with the skip link (`src/pages.test.ts`, across every page including the 404 and the booking error state).
+- [ ] Invalid or unknown ids (`/agents/999`, `/appointments/abc`) get the styled 404 page, not plain text.
+- [ ] A database failure in a real route returns the 500 page.
 
 ### Regression
 - [ ] All Phase 0 and Phase 1 checks still pass: layout, Pico, and the stylesheet rules (including no `max-width` media queries).
@@ -115,7 +118,10 @@ Run `npm run db:migrate && npm run db:seed && npm run dev` and open `http://loca
 - [ ] Each page's heading outline is logical (one `<h1>`, no skipped levels).
 
 ### Browsers
-- [ ] Every page and the booking flow work in the latest Chrome, Firefox, Safari, and Edge.
+- [ ] Chrome (automated, headless): every page at three widths in both themes, a keyboard walk of every Tab stop, and the booking flow with and without JavaScript.
+- [ ] Firefox (by hand): every page and the booking flow, including the htmx slot list.
+- [ ] Safari (by hand): every page and the booking flow, including the htmx slot list.
+- [ ] Edge (by hand): a spot check of the booking flow (same engine as Chrome).
 
 ### Offline and content
 - [ ] No page requests anything outside its own origin (Pico and htmx are served locally).

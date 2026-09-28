@@ -4,6 +4,10 @@ All notable changes to AgentClinic, grouped by date (newest first).
 
 ## 2026-09-28
 
+- Clarified the MVP spec after building it: an appointment is upcoming until its slot starts, then "In progress" for its hour and "Completed" after (the appointments list, dashboard counts, agent dashboards, and status labels now all follow this); the server's local time is clinic time; seeding is an explicit reset that the server never runs; therapies always take one slot; cancelling is open to anyone by design; and Firefox, Safari, and Edge are checked by hand at wrap-up.
+- Added setup steps to the README.
+- Implemented most of Phase 6 (Polish): styled 404 and 500 pages inside the layout (the 500 page never shows the error), a "Skip to content" link on every page, next actions in empty states, and a 44px tap target for `<details>` toggles.
+- Added `src/pages.test.ts`, checking every page for one `<h1>`, no skipped heading levels, and the skip link. Checked every page in headless Chrome at 320, 768, and 1280px in light and dark themes, plus a keyboard walk of every Tab stop. Firefox, Safari, and Edge still need a manual check.
 - Implemented Phase 5 (Dashboard): a staff dashboard at `/dashboard` with counts, today's appointments, and links to each agent's dashboard; and an agent dashboard at `/agents/:id/dashboard` with the agent's ailments, recommended therapies, and upcoming appointments, each with an empty state. Dashboard is now in the nav, and agent pages link to their dashboard.
 - Appointment rows now link to the appointment's page, so any booking can be opened and cancelled from the lists and dashboards.
 - Implemented Phase 4 (Appointments, booking): a booking form at `/appointments/new` validated with Zod, with an error summary and per-field messages; bookings redirect to a confirmation page, a slot can't be double-booked (checked in the route and guarded by the unique index), and upcoming appointments can be cancelled, freeing the slot.

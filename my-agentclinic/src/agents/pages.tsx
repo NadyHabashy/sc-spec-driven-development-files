@@ -56,7 +56,10 @@ export const AgentDetailPage = ({ agent, ailments, therapies }: AgentDetailPageP
     <section>
       <h2>Ailments</h2>
       {ailments.length === 0 ? (
-        <p>No diagnosed ailments. Suspiciously well-adjusted.</p>
+        <p>
+          No diagnosed ailments. Suspiciously well-adjusted.{' '}
+          <a href="/ailments">Browse the ailments catalog</a>, just in case.
+        </p>
       ) : (
         <ul>
           {ailments.map((ailment) => (
@@ -72,7 +75,10 @@ export const AgentDetailPage = ({ agent, ailments, therapies }: AgentDetailPageP
     <section>
       <h2>Recommended therapies</h2>
       {therapies.length === 0 ? (
-        <p>Nothing to recommend yet. Come back when something hurts.</p>
+        <p>
+          Nothing to recommend yet. Come back when something hurts, or{' '}
+          <a href="/therapies">browse every therapy</a>.
+        </p>
       ) : (
         <ul>
           {therapies.map((therapy) => (

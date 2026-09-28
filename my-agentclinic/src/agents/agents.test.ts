@@ -73,6 +73,8 @@ describe('GET /agents/:id', () => {
 
     expect(body).toContain('No diagnosed ailments.')
     expect(body).toContain('Nothing to recommend yet.')
+    expect(body).toContain('<a href="/ailments">Browse the ailments catalog</a>')
+    expect(body).toContain('<a href="/therapies">browse every therapy</a>')
   })
 
   it.each(['/agents/999', '/agents/abc', '/agents/0', '/agents/1.5'])(

@@ -37,7 +37,7 @@ The app is built in very small phases. Each phase is shippable on its own: the a
 - [x] Agent view: my ailments, therapies, and upcoming appointments
 
 ## Phase 6: Polish
-- [ ] Empty states, error pages, and a 404 page
-- [ ] Accessibility pass
+- [x] Empty states, error pages, and a 404 page
+- [x] Accessibility pass
 - [ ] Cross-browser check in evergreen browsers
-- [ ] Responsive check of every page at phone, tablet, and desktop widths
+- [x] Responsive check of every page at phone, tablet, and desktop widths

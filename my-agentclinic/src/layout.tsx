@@ -24,6 +24,9 @@ export const Layout = ({ title, currentPath, scripts = [], children }: LayoutPro
       ))}
     </head>
     <body>
+      <a class="skip-link" href="#main">
+        Skip to content
+      </a>
       <Header currentPath={currentPath} />
       <Main>{children}</Main>
       <Footer />

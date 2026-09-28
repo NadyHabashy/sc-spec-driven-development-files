@@ -44,6 +44,19 @@ export const hasStarted = (date: string, slot: string, now: Date) => {
   return date < today || (date === today && slot <= toTime(now))
 }
 
+// A slot has ended an hour after it starts.
+export const hasEnded = (date: string, slot: string, now: Date) => {
+  const today = toIsoDate(now)
+  const end = `${pad(Number(slot.slice(0, 2)) + 1)}:${slot.slice(3)}`
+  return date < today || (date === today && end <= toTime(now))
+}
+
+// Named SQL parameters for "has this appointment's slot started?", so queries
+// use the same rule as hasStarted.
+export const clock = (now: Date) => ({ today: toIsoDate(now), time: toTime(now) })
+export const notStartedSql =
+  '(appointments.date > @today OR (appointments.date = @today AND appointments.slot > @time))'
+
 const isoDate = /^\d{4}-\d{2}-\d{2}$/
 
 // True for a real calendar date written as YYYY-MM-DD (not 2026-02-30).

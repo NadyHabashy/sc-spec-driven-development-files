@@ -112,6 +112,14 @@ describe('GET /styles.css', () => {
     expect(css).toMatch(/header nav,\s*header nav ul\s*{[^}]*flex-wrap:\s*wrap/)
   })
 
+  it('gives details toggles and the skip link a touch target', async () => {
+    const css = await (await app.request('/styles.css')).text()
+
+    expect(css).toMatch(/details summary\s*{[^}]*min-height:\s*var\(--touch-target\)/)
+    expect(css).toMatch(/\.skip-link\s*{[^}]*min-height:\s*var\(--touch-target\)/)
+    expect(css).toMatch(/\.skip-link:focus\s*{[^}]*top:/)
+  })
+
   it('keeps table dates and times on one line', async () => {
     const css = await (await app.request('/styles.css')).text()
 

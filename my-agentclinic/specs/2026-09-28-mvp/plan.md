@@ -91,7 +91,7 @@ See `requirements.md` for scope and decisions, and `validation.md` for merge cri
 
 ## 6. Phase 6: Polish
 
-6.1 Create `src/errors/`: a `NotFoundPage` (404, inside the layout, playful copy, link home) wired through `app.notFound`, and an `ErrorPage` (500, no stack trace) wired through `app.onError`, which logs with `console.error`.
+6.1 Create `src/errors/`: a `NotFoundPage` (404, inside the layout, playful copy, link home) wired through `app.notFound`, which also serves the routes' `c.notFound()` for invalid or unknown ids, and an `ErrorPage` (500, no error message or stack trace) wired through `app.onError`, which logs with `console.error`.
 6.2 Review every list for its empty state (appointments, today, agent ailments, recommended therapies, therapies for an ailment, agents for an ailment) and add playful copy with a next action.
 6.3 Accessibility pass:
   - Add a "Skip to content" link targeting `<main id="main">` in `Layout`.
@@ -100,9 +100,9 @@ See `requirements.md` for scope and decisions, and `validation.md` for merge cri
   - Check form errors are announced and linked.
   - Check severity and status appear as text.
   - Check focus is visible, and check contrast in both themes.
-6.4 Responsive pass: check every page at `320px`, `768px`, and `1280px`, including the wrapping nav with six links and the scrolling tables. Fix issues in `public/styles.css` using `min-width` queries only.
-6.5 Cross-browser pass in the latest Chrome, Firefox, Safari, and Edge.
-6.6 Tests: `src/errors/errors.test.ts`, plus skip-link and empty-state assertions in the relevant page tests.
+6.4 Responsive pass: check every page at `320px`, `768px`, and `1280px`, including the wrapping nav with six links and the scrolling tables. Fix issues in `public/styles.css` using `min-width` queries only. The pass found the `<details>` summary was only 16–20px tall, so it now has a `2.75rem` minimum height (flex, keeping Pico's chevron on the right).
+6.5 Cross-browser pass in the latest Chrome, Firefox, Safari, and Edge. Automated in headless Chrome (layout at three widths in both themes, a keyboard walk of every Tab stop, and the booking flow with and without JavaScript). Firefox, Safari, and Edge still need a manual pass: headless Firefox wouldn't start from the development session ("Could not find profile folder"), Safari's WebDriver needs "Allow Remote Automation" turned on by the user, and Edge isn't installed (it shares Chrome's engine).
+6.6 Tests: `src/errors/errors.test.ts`; `src/pages.test.ts`, which checks every page (including the 404, the booking error state, and a confirmation) for one `<h1>` first, no skipped heading levels, and the skip link; plus empty-state and stylesheet assertions in the relevant tests.
 
 ## 7. Wrap-up
 

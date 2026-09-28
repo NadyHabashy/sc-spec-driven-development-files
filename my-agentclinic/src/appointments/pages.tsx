@@ -52,12 +52,12 @@ export const AppointmentsTable = ({ caption, appointments, statusFor }: Appointm
 )
 
 export type AppointmentsPageProps = {
-  today: string
+  now: Date
   upcoming: readonly AppointmentRow[]
   pastOrCancelled: readonly AppointmentRow[]
 }
 
-export const AppointmentsPage = ({ today, upcoming, pastOrCancelled }: AppointmentsPageProps) => (
+export const AppointmentsPage = ({ now, upcoming, pastOrCancelled }: AppointmentsPageProps) => (
   <Layout title="Appointments · AgentClinic" currentPath="/appointments">
     <h1>Appointments</h1>
     <p>Who's on the couch, and when. Please arrive a few tokens early.</p>
@@ -68,7 +68,10 @@ export const AppointmentsPage = ({ today, upcoming, pastOrCancelled }: Appointme
     </p>
 
     {upcoming.length === 0 ? (
-      <p>No upcoming appointments. The therapists are catching up on their own reading.</p>
+      <p>
+        No upcoming appointments. The therapists are catching up on their own reading.{' '}
+        <a href="/appointments/new">Be the first to book</a>.
+      </p>
     ) : (
       <AppointmentsTable caption="Upcoming appointments" appointments={upcoming} />
     )}
@@ -79,7 +82,7 @@ export const AppointmentsPage = ({ today, upcoming, pastOrCancelled }: Appointme
         <AppointmentsTable
           caption="Past and cancelled appointments"
           appointments={pastOrCancelled}
-          statusFor={(appointment) => statusLabel(appointment, today)}
+          statusFor={(appointment) => statusLabel(appointment, now)}
         />
       </details>
     )}

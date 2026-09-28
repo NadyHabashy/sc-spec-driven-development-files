@@ -1,6 +1,7 @@
 import Database from 'better-sqlite3'
 import type { Db } from '../db/connection.js'
 import type { Appointment, Ref } from '../db/types.js'
+import { clock, notStartedSql } from './slots.js'
 
 // An appointment with the names needed to show and link it.
 export type AppointmentRow = Appointment & { agent_name: string; therapy_name: string }
@@ -11,25 +12,27 @@ const select = `
   JOIN agents ON agents.id = appointments.agent_id
   JOIN therapies ON therapies.id = appointments.therapy_id`
 
-// Booked appointments from `today` (YYYY-MM-DD) on, soonest first.
-export const listUpcoming = (db: Db, today: string): AppointmentRow[] =>
+type Clock = ReturnType<typeof clock>
+
+// Booked appointments whose slot hasn't started yet, soonest first.
+export const listUpcoming = (db: Db, now: Date): AppointmentRow[] =>
   db
-    .prepare<[string], AppointmentRow>(
+    .prepare<[Clock], AppointmentRow>(
       `${select}
-       WHERE appointments.status = 'booked' AND appointments.date >= ?
+       WHERE appointments.status = 'booked' AND ${notStartedSql}
        ORDER BY appointments.date, appointments.slot`,
     )
-    .all(today)
+    .all(clock(now))
 
-// Appointments before `today`, and cancelled ones on any date, latest first.
-export const listPastOrCancelled = (db: Db, today: string): AppointmentRow[] =>
+// Appointments whose slot has started, and cancelled ones, latest first.
+export const listPastOrCancelled = (db: Db, now: Date): AppointmentRow[] =>
   db
-    .prepare<[string], AppointmentRow>(
+    .prepare<[Clock], AppointmentRow>(
       `${select}
-       WHERE appointments.status = 'cancelled' OR appointments.date < ?
+       WHERE appointments.status = 'cancelled' OR NOT ${notStartedSql}
        ORDER BY appointments.date DESC, appointments.slot DESC`,
     )
-    .all(today)
+    .all(clock(now))
 
 export const getAppointment = (db: Db, id: number): AppointmentRow | undefined =>
   db.prepare<[number], AppointmentRow>(`${select} WHERE appointments.id = ?`).get(id)
@@ -108,12 +111,12 @@ export const listForDay = (db: Db, today: string): AppointmentRow[] =>
     )
     .all(today)
 
-// One agent's booked appointments from `today` on, soonest first.
-export const upcomingForAgent = (db: Db, agentId: number, today: string): AppointmentRow[] =>
+// One agent's booked appointments that haven't started, soonest first.
+export const upcomingForAgent = (db: Db, agentId: number, now: Date): AppointmentRow[] =>
   db
-    .prepare<[number, string], AppointmentRow>(
+    .prepare<[Clock & { agentId: number }], AppointmentRow>(
       `${select}
-       WHERE appointments.agent_id = ? AND appointments.status = 'booked' AND appointments.date >= ?
+       WHERE appointments.agent_id = @agentId AND appointments.status = 'booked' AND ${notStartedSql}
        ORDER BY appointments.date, appointments.slot`,
     )
-    .all(agentId, today)
+    .all({ agentId, ...clock(now) })

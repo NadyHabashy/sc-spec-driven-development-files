@@ -59,6 +59,23 @@
   padding-inline: var(--pico-spacing);
 }
 
+/* Off-screen until focused, so keyboard users can jump past the nav. */
+.skip-link {
+  position: absolute;
+  z-index: 10;
+  inset-inline-start: var(--pico-spacing);
+  top: -10rem;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-target);
+  padding-inline: var(--pico-spacing);
+  background-color: var(--pico-background-color);
+}
+
+.skip-link:focus {
+  top: var(--pico-spacing);
+}
+
 svg,
 video {
   max-width: 100%;
@@ -147,6 +164,19 @@ nav li a[aria-current="page"] {
 
 .stat p:last-child {
   margin-bottom: 0;
+}
+
+/* A 44px tap target for <details> toggles. Flex keeps Pico's chevron on the
+   right, where its float would otherwise stop applying. */
+details summary {
+  display: flex;
+  align-items: center;
+  min-height: var(--touch-target);
+}
+
+details summary::after {
+  flex-shrink: 0;
+  margin-inline-start: auto;
 }
 
 /* Keep dates and times on one line; on phones the table scrolls sideways

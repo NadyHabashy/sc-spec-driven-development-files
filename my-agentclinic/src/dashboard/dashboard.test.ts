@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { seedAgents } from '../db/seed.js'
-import { testApp, testDb } from '../test/db.js'
+import { fixedNow, testApp, testDb } from '../test/db.js'
 import { counts } from './queries.js'
 
 // fixedNow is Thu, Oct 1, 2026 at 10:30. The seed has 3 booked appointments
@@ -24,7 +24,7 @@ describe('GET /dashboard', () => {
     ].map((m) => [m[2], Number(m[1])])
     expect(Object.fromEntries(stats)).toEqual({
       'Appointments today': 3,
-      'Upcoming, including today': 8,
+      Upcoming: 7,
       Agents: 6,
       Ailments: 8,
       Therapies: 6,
@@ -38,6 +38,9 @@ describe('GET /dashboard', () => {
     expect(today).toContain('<caption>Today&#39;s appointments</caption>')
     const slots = [...today.matchAll(/<time datetime="2026-10-01T(\d\d:\d\d)">/g)].map((m) => m[1])
     expect(slots).toEqual(['09:00', '11:00', '14:00'])
+    // Staff still see today's started appointments, with their status.
+    expect(today).toContain('<th scope="col">Status</th>')
+    expect(today).toMatch(/09:00<\/time><\/td>[\s\S]*?<td>Completed<\/td>/)
     expect(today).not.toContain('2026-10-02')
   })
 
@@ -59,6 +62,7 @@ describe('GET /dashboard', () => {
     const body = await (await testApp(db).request('/dashboard')).text()
 
     expect(section(body, 'today')).toContain('No appointments today.')
+    expect(section(body, 'today')).toContain('<a href="/appointments/new">Book an appointment</a>')
     expect(section(body, 'glance')).toContain(
       '<p class="stat-value">0</p><p><a href="#today">Appointments today</a>',
     )
@@ -66,13 +70,13 @@ describe('GET /dashboard', () => {
 })
 
 describe('counts', () => {
-  it('ignores cancelled and past appointments', () => {
-    expect(counts(testDb(), '2026-10-01')).toEqual({
+  it('counts all of today, but only unstarted appointments as upcoming', () => {
+    expect(counts(testDb(), fixedNow())).toEqual({
       agents: 6,
       ailments: 8,
       therapies: 6,
       today: 3,
-      upcoming: 8,
+      upcoming: 7,
     })
   })
 })
@@ -111,6 +115,7 @@ describe('GET /agents/:id/dashboard', () => {
     expect(body).toContain('Nothing diagnosed.')
     expect(body).toContain('No therapies to recommend.')
     expect(body).toContain('Nothing booked.')
+    expect(body).toContain('<a href="/appointments/new?agentId=6">Book your first session</a>')
     expect(body).not.toContain('<table>')
     expect(body).toContain(
       '<a href="/appointments/new?agentId=6" role="button">Book an appointment</a>',

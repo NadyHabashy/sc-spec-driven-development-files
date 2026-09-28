@@ -21,14 +21,14 @@ const rowsAfter = (body: string, marker: string) => {
 }
 
 describe('GET /appointments', () => {
-  it('lists upcoming booked appointments in date-then-slot order', async () => {
+  it('lists booked appointments that have not started, in date-then-slot order', async () => {
     const res = await app.request('/appointments')
     expect(res.status).toBe(200)
     expect(res.headers.get('Content-Type')).toMatch(/^text\/html/)
 
     const rows = rowsAfter(await res.text(), '<caption>Upcoming appointments</caption>')
+    // Today's 09:00 has started by 10:30, so it's no longer upcoming.
     expect(rows).toEqual([
-      ['Thu, Oct 1, 2026', '09:00', 'Ada Loop', 'Context Detox'],
       ['Thu, Oct 1, 2026', '11:00', 'Byte Hopper', 'Grounding Sessions'],
       ['Thu, Oct 1, 2026', '14:00', 'Captain Prompt', 'Boundary Training'],
       ['Fri, Oct 2, 2026', '10:00', 'Tokenetta', 'Mindful Token Breathing'],
@@ -46,13 +46,14 @@ describe('GET /appointments', () => {
     expect(body).toContain('<a href="/therapies#therapy-1">Context Detox</a>')
   })
 
-  it('puts past and cancelled appointments in a <details>, with status as text', async () => {
+  it('puts started and cancelled appointments in a <details>, with status as text', async () => {
     const body = await page()
     const details = body.slice(body.indexOf('<details>'), body.indexOf('</details>'))
 
-    expect(details).toContain('<summary>Past and cancelled appointments (2)</summary>')
+    expect(details).toContain('<summary>Past and cancelled appointments (3)</summary>')
     expect(rowsAfter(details, '<caption>')).toEqual([
       ['Sat, Oct 3, 2026', '11:00', 'Tokenetta', 'Context Detox', 'Cancelled'],
+      ['Thu, Oct 1, 2026', '09:00', 'Ada Loop', 'Context Detox', 'Completed'],
       ['Wed, Sep 30, 2026', '10:00', 'Rex Regex', 'Grounding Sessions', 'Completed'],
     ])
 
@@ -66,7 +67,7 @@ describe('GET /appointments', () => {
 
     expect(body).toMatch(/<div class="overflow-auto"><table><caption>Upcoming appointments/)
     expect(body).toContain('<th scope="col">Date</th>')
-    expect(body).toMatch(/<th scope="row"><a href="\/appointments\/1"><time datetime="2026-10-01">/)
+    expect(body).toMatch(/<th scope="row"><a href="\/appointments\/2"><time datetime="2026-10-01">/)
     expect(body).toMatch(/<a [^>]*aria-current="page"[^>]*>Appointments<\/a>/)
   })
 
@@ -76,6 +77,7 @@ describe('GET /appointments', () => {
     const body = await (await testApp(db).request('/appointments')).text()
 
     expect(body).toContain('No upcoming appointments.')
+    expect(body).toContain('<a href="/appointments/new">Be the first to book</a>')
     expect(body).toContain('<a href="/appointments/new" role="button">Book an appointment</a>')
     expect(body).not.toContain('<table>')
     expect(body).not.toContain('<details>')
@@ -83,14 +85,20 @@ describe('GET /appointments', () => {
 })
 
 describe('appointment queries', () => {
-  it('treat appointments later today as upcoming, and yesterday as past', () => {
+  it('split today by whether the slot has started', () => {
     const db = testDb()
-    const today = toIsoDate(new Date(2026, 9, 1))
+    const ids = (now: Date) => ({
+      upcoming: listUpcoming(db, now).map((a) => a.id),
+      past: listPastOrCancelled(db, now).map((a) => a.id),
+    })
 
-    expect(listUpcoming(db, today).every((a) => a.date >= today && a.status === 'booked')).toBe(
-      true,
-    )
-    expect(listPastOrCancelled(db, today).map((a) => a.id)).toEqual([10, 9])
+    // Oct 1: 1 at 09:00, 2 at 11:00, 3 at 14:00.
+    expect(ids(new Date(2026, 9, 1, 8, 59))).toMatchObject({ upcoming: [1, 2, 3, 4, 5, 6, 7, 8] })
+    expect(ids(new Date(2026, 9, 1, 9, 0))).toMatchObject({ past: [10, 1, 9] })
+    expect(ids(new Date(2026, 9, 1, 11, 30))).toEqual({
+      upcoming: [3, 4, 5, 6, 7, 8],
+      past: [10, 2, 1, 9],
+    })
   })
 })
 
