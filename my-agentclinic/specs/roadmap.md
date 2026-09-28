@@ -14,6 +14,7 @@ The app is built in very small phases. Each phase is shippable on its own: the a
 - [x] Home page with playful clinic copy
 
 ## Phase 2: Data and catalog
+- [x] Prettier and ESLint, run by `npm run validate`
 - [x] SQLite connection with `better-sqlite3`
 - [x] Simple migration runner
 - [x] Seed script
