@@ -191,3 +191,19 @@ describe('createAppointment', () => {
     expect(() => createAppointment(db, booking)).toThrow(/FOREIGN KEY/)
   })
 })
+
+describe('notes with line breaks', () => {
+  it('accepts 500 typed characters with line breaks and stores them with \\n', async () => {
+    const { db, app } = setup()
+    const notes = 'z' + ('\n' + 'z'.repeat(98)).repeat(5) + 'z'.repeat(4)
+
+    const res = await post(app, { ...free, notes: notes.replace(/\n/g, '\r\n') })
+    expect(res.status).toBe(303)
+
+    const id = Number(/\/appointments\/(\d+)/.exec(res.headers.get('Location') ?? '')?.[1])
+    const row = db
+      .prepare<[number], { notes: string }>('SELECT notes FROM appointments WHERE id = ?')
+      .get(id)
+    expect(row?.notes).toBe(notes)
+  })
+})

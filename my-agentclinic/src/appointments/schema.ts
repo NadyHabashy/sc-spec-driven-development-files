@@ -23,8 +23,12 @@ export const bookingSchema = (now: Date) => {
           .refine(isIsoDate, 'Enter a real date, like 2026-10-01.')
           .refine((date) => date >= today, 'Pick today or a later date. We can’t treat the past.'),
         slot: z.enum(SLOTS, { error: 'Choose one of the listed times.' }),
+        // Forms submit newlines as \r\n, but the textarea's maxlength counts each
+        // as one character; normalize first so both agree on the 500 limit, and
+        // store plain \n.
         notes: z
           .string()
+          .overwrite((notes) => notes.replace(/\r\n?/g, '\n'))
           .trim()
           .max(500, 'Keep notes to 500 characters or fewer.')
           .optional()

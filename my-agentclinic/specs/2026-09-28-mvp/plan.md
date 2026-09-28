@@ -57,7 +57,7 @@ See `requirements.md` for scope and decisions, and `validation.md` for merge cri
 ## 4. Phase 4: Appointments (booking)
 
 ### Form and validation
-4.1 Create `src/appointments/schema.ts`: `bookingSchema` (Zod) for `agentId`, `therapyId`, `date`, `slot`, and `notes`. It takes `today` and `currentTime` through a factory, `bookingSchema(now)`, so past-date and past-slot rules are testable. The started-slot rule applies only to today's date, so a past date gets one error, not two. Ids reuse `positiveId(message)` from `src/validation/params.ts`. Export `BookingInput = z.infer<…>` and `fieldErrors`, which keeps the first message per field.
+4.1 Create `src/appointments/schema.ts`: `bookingSchema` (Zod) for `agentId`, `therapyId`, `date`, `slot`, and `notes`. It takes `today` and `currentTime` through a factory, `bookingSchema(now)`, so past-date and past-slot rules are testable. The started-slot rule applies only to today's date, so a past date gets one error, not two. Ids reuse `positiveId(message)` from `src/validation/params.ts`. Normalize `\r\n` in notes to `\n` (Zod `.overwrite`) before trimming and the 500-character check, so the server counts line breaks the way the textarea's `maxlength` does. Export `BookingInput = z.infer<…>` and `fieldErrors`, which keeps the first message per field.
 4.2 Create a `BookingForm` component. Every control has a `<label>`. Invalid fields get `aria-invalid` and `aria-describedby` pointing to their error message. An error summary (`role="alert"`) at the top links to each field. Submitted values are re-filled.
 4.3 `GET /appointments/new` renders the form (`?agentId=` preselects the agent, and today is the default date).
 

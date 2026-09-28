@@ -32,6 +32,17 @@ describe('bookingSchema', () => {
     expect(bookingSchema(fixedNow()).parse({ ...valid, notes: '   ' }).notes).toBeNull()
   })
 
+  it('counts a submitted line break (\\r\\n) as one character, like the textarea does', () => {
+    // 500 characters as typed, including 5 line breaks; a form submits 505.
+    const notes = 'z' + ('\n' + 'z'.repeat(98)).repeat(5) + 'z'.repeat(4)
+    const submitted = notes.replace(/\n/g, '\r\n')
+    expect(notes).toHaveLength(500)
+    expect(submitted).toHaveLength(505)
+
+    expect(bookingSchema(fixedNow()).parse({ ...valid, notes: submitted }).notes).toBe(notes)
+    expect(errorsFor({ ...valid, notes: submitted + 'z' })).toHaveProperty('notes')
+  })
+
   it('accepts a later slot today', () => {
     expect(errorsFor({ ...valid, date: '2026-10-01', slot: '11:00' })).toEqual({})
   })

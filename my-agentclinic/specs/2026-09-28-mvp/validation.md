@@ -54,6 +54,7 @@ Tests use an in-memory SQLite database (`':memory:'`), migrated and seeded per t
   - a past date
   - a slot earlier today that has already started
   - `notes` over 500 characters
+- [x] Notes count a submitted line break (`\r\n`) as one character, as the textarea's `maxlength` does: 500 typed characters with line breaks are accepted and stored with `\n` (`src/appointments/schema.test.ts`, `src/appointments/booking.test.ts`).
 - [x] `GET /appointments/new` renders a form where every control has an associated `<label>`, and `?agentId=2` preselects agent 2.
 - [x] A valid `POST /appointments` returns 303 to `/appointments/{id}?booked=1` and inserts one `booked` row.
 - [x] Following the redirect shows the confirmation banner with the agent, therapy, date, and slot.
@@ -129,7 +130,7 @@ Run `npm run db:migrate && npm run db:seed && npm run dev` and open `http://loca
 
 ## Results (2026-09-28)
 
-- `npm run validate` passes: type-check, ESLint, Prettier, and 229 Vitest tests.
+- `npm run validate` passes: type-check, ESLint, Prettier, and 231 Vitest tests.
 - Gate: after `npm run build`, `db:migrate`, and `db:seed`, `node my-agentclinic/dist/index.js` started from the parent folder served `/` and `/agents` (200, all 6 agents) from the project's database.
 - Automated manual checks ran in headless Chrome 153 against that build, driven over the DevTools protocol:
   - 15 pages (including the 404 and an anchored ailment) at `320px`, `768px`, and `1280px` in light and dark themes (90 combinations). None had horizontal page scroll, overflowing elements, a tap target under 44px, text under 4.5:1 contrast, or more than one `<h1>`.

@@ -4,6 +4,7 @@ All notable changes to AgentClinic, grouped by date (newest first).
 
 ## 2026-09-28
 
+- Fixed a branch review finding: booking notes now count a line break as one character, as the form's text box does, so a note the browser allows is no longer rejected for being over 500 characters. Notes are stored with plain `\n` line breaks.
 - Wrapped up the MVP: ran every check in `specs/2026-09-28-mvp/validation.md` and recorded the results. 69 of 75 checks pass, including a production build started from another folder and a full headless Chrome pass of every page, the keyboard, and the booking flow. Still open before merging to `main`: completing the booking form with the keyboard alone, a VoiceOver pass, disabled-option contrast, and Firefox, Safari, and Edge by hand.
 - Added the delivered Tooling item to Phase 2 of the roadmap. Every roadmap item is done except the cross-browser check.
 - Clarified the MVP spec after building it: an appointment is upcoming until its slot starts, then "In progress" for its hour and "Completed" after (the appointments list, dashboard counts, agent dashboards, and status labels now all follow this); the server's local time is clinic time; seeding is an explicit reset that the server never runs; therapies always take one slot; cancelling is open to anyone by design; and Firefox, Safari, and Edge are checked by hand at wrap-up.
